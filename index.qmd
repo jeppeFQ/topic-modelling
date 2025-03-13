@@ -365,78 +365,279 @@ Slut
 
 ## LDA algoritmen (2)
 
-
-Topic models see text as generated from probabilistic distributions:
-
-- uncovering hidden semantic structures in textual data. It relies heavily on probabilistic and mathematical foundations, such as the Dirichlet and multinomial distributions.
-
-- Multinomial distribution: Used for modeling discrete counts of words.
-
-- Dirichlet distribution: A family of continuous multivariate probability distributions often used as a prior for multinomial distributions.
-
-- The Dirichlet distribution is useful because it is the conjugate prior to the multinomial distribution. This mathematical convenience simplifies Bayesian inference significantly.
+Vi bruger en afart af `Bayes Theorem` til LDA, hvor vi opdaterer modellens parametre ($\theta, \phi, z$), ved at observere data, ordene, $w$:
 
 $$
-\text{Dir}(\theta|\alpha) = 
-\frac{\Gamma\left(\sum_{i=1}^{K}\alpha_i\right)}{\prod_{i=1}^{K}\Gamma(\alpha_i)} \prod_{i=1}^{K} x_i^{\alpha_i - 1}
+P(\theta, \phi, z \mid w, \alpha, \beta) = \frac{P(w \mid z, \phi)P(z \mid \theta)P(\theta \mid \alpha)P(\phi \mid \beta)}{P(w \mid \alpha, \beta)}
 $$
 
 Hvor, 
 
+- $w$ er observerede ord.
+
+- $z$ er latente topics.
+
+- $\theta$ er `Document-topic` fordelingen.
+
+- $\phi$ er `Topic-word` fordelingen. 
+
+- $\alpha, \beta$ er `hyperparametre`. 
+
+## LDA algoritmen (3.1)
+
+Vi bruger en afart af `Bayes Theorem` til LDA, hvor vi opdaterer modellens parametre ($\theta, \phi, z$), ved at observere data, ordene, $w$:
+
 $$
-1+1
+P(\theta, \phi, z \mid w, \alpha, \beta) = \frac{P(w \mid z, \phi)P(z \mid \theta)P(\theta \mid \alpha)P(\phi \mid \beta)}{P(w \mid \alpha, \beta)}
 $$
 
-## LDA algoritmen (3)
+::: {.incremental}
 
-- LDA assumes that each document is generated from a mixture of topics, and each topic is a distribution over words.
+- $P(w|z, \phi)$ er sandsynligheden for at observere ordene $w$, hvis vi kender topic-tildelingerne $z$ og topic-word fordelingerne $\phi$.
 
-How LDA works:
+    - <p><span style="font-size:0.7em">*Når vi ved, hvilke topics ord kommer fra, og hvordan topics "genererer" ord, kan vi beregne sandsynligheden for ordene i dokumenterne.*</span></p>
 
-    Each document dd is assumed to have a topic distribution θdθd​.
-    Each topic tt has a word distribution ϕtϕt​.
+- $P(z|\theta)$ er sandsynligheden for at hvert ord får en bestemt topic-tildeling $z$, givet dokumenternes emnefordeling $\theta$.
 
-    The generative process (simplified):
+    - <p><span style="font-size:0.7em">*Hvis vi ved, hvor meget hvert topic fylder i dokumentet, kan vi beregne sandsynligheden for, at ordet tilhører et bestemt topic.*</span></p>
 
-    For each document dd, choose a topic distribution θd∼Dir(α)θd​∼Dir(α).
-    For each topic tt, choose a word distribution ϕt∼Dir(β)ϕt​∼Dir(β).
-    For each word wdnwdn​ in document dd:
-        Choose a topic zdn∼Multinomial(θd)zdn​∼Multinomial(θd​).
-        Choose a word wdn∼Multinomial(ϕzdn)wdn​∼Multinomial(ϕzdn​​).
+:::
 
-LDA inference aims at finding these hidden distributions from observed data. Exact inference is computationally infeasible, so approximation methods are used:
+## LDA algoritmen (3.2)
 
-    Gibbs Sampling (a type of Markov Chain Monte Carlo)
-    Variational Inference
+Vi bruger en afart af `Bayes Theorem` til LDA, hvor vi opdaterer modellens parametre ($\theta, \phi, z$), ved at observere data, ordene, $w$:
 
-Mathematically, LDA tries to maximize the posterior probability:
+$$
+P(\theta, \phi, z \mid w, \alpha, \beta) = \frac{P(w \mid z, \phi)P(z \mid \theta)P(\theta \mid \alpha)P(\phi \mid \beta)}{P(w \mid \alpha, \beta)}
+$$
 
-Since this posterior is complex and hard to compute exactly, algorithms such as Variational Inference or Gibbs Sampling (Markov Chain Monte Carlo) are used to approximate it.
+::: {.incremental}
 
-LDA relies on probability distributions:
+- $P(\theta|\alpha)$ er sandsynligheden for document-topic fordelingen $\theta$, givet *Dirichlet-fordelingen* med hyperparametre $\alpha$.
 
-    Dirichlet Distribution:
-    Controls how evenly distributed (or sparse) topics or words are.
-        A high value creates evenly mixed distributions (each topic has many words).
-        A low value creates sparse distributions (topics focus on fewer words).
+    - <p><span style="font-size:0.7em">*Vi starter med en antagelse om, hvordan topics typisk fordeler sig i dokumenter (bestemt af \alpha). Denne antagelse justeres iterativt, når vi ser på data.*</span></p>
 
-    Multinomial Distribution:
-    Models choosing a topic or word based on probabilities (like rolling a weighted dice).
+- $P(\psi|\beta)$ er sandsynligheden for topic-word fordelingen $\psi$, givet *Dirichlet-fordelingen* med hyperparametre $\beta$.
 
-Simplified Generative Process:
+    - <p><span style="font-size:0.7em">*Vi starter med en antagelse om, hvordan ordene typisk fordeler sig i topics (bestemt af $\beta$). Denne antagelse justeres iterativt ud fra data.*</span></p>
 
-    For each document:
-        Choose a topic distribution (using Dirichlet).
-        For each word:
-            Choose a topic from the document’s topic distribution.
-            Choose a word from the chosen topic’s word distribution.
+:::
 
-    Don’t worry if the math seems complicated. The key takeaway:
+## LDA algoritmen (3.3)
 
-        Topics and Documents have probabilities.
-        Words come from these probability distributions.
+Vi bruger en afart af `Bayes Theorem` til LDA, hvor vi opdaterer modellens parametre ($\theta, \phi, z$), ved at observere data, ordene, $w$:
+
+$$
+P(\theta, \phi, z \mid w, \alpha, \beta) = \frac{P(w \mid z, \phi)P(z \mid \theta)P(\theta \mid \alpha)P(\phi \mid \beta)}{P(w \mid \alpha, \beta)}
+$$
+
+::: {.incremental}
+
+- $P(w|\alpha, \beta)$ er en *normaliseringsfaktor*, der sikrer at sandsynlighederne summerer til 1.
+    
+:::
+
+## LDA algoritmen (3.4)
+
+Vi bruger en afart af `Bayes Theorem` til LDA, hvor vi opdaterer modellens parametre ($\theta, \phi, z$), ved at observere data, ordene, $w$:
+
+$$
+P(\theta, \phi, z \mid w, \alpha, \beta) = \frac{P(w \mid z, \phi)P(z \mid \theta)P(\theta \mid \alpha)P(\phi \mid \beta)}{P(w \mid \alpha, \beta)}
+$$
+
+Dette sker ved inferens, hvor algoritmen ser på data (tekster) og finder skjulte mønstre i ordforekomster.
+
+Formlen beskriver, hvordan LDA bruger data (ordene i dokumenterne) og tidligere antagelser (hyperparametrene) til iterativt at finde og opdatere emner og deres fordelinger.
+
+Den gør dette iterativt, indtil sandsynligheden for at observere vores data (givet modellerede emner) bliver maksimal—og resultatet bliver en realistisk, meningsfuld inddeling af store tekstsamlinger i skjulte emner.
+
+Grundlæggende vil vi finde ...  der forsøger at finde de værdier for θθ, ϕϕ og zz, der gør, at sandsynligheden bliver størst muligt (maksimerer posterior-sandsynligheden).
+
+Hypotetisk output: 
+
+Dokument-emne fordeling (θθ):
+
+    Én artikel består måske af 70% politik, 20% økonomi og 10% teknologi.
+
+Emne-ord fordeling (ϕϕ):
+
+    Emnet "politik" kunne være kendetegnet ved ord som "regering", "valg", "minister".
+    Emnet "økonomi" ved ord som "inflation", "arbejdsløshed", "vækst".
+
+LDA starter med tilfældige gæt om disse fordelinger. Derefter opdaterer den iterativt:
+
+    Hver gang algoritmen går igennem data, får den bedre "gæt".
+    Dokumenterne stabiliserer sig i klare emne-proportioner, og emnerne stabiliserer sig med klare ord-proportioner.
+
+Til sidst får vi:
+
+    Klare emner med meningsfulde ord (emne-ord fordelinger).
+    Tydelige proportioner af emner i dokumenterne (dokument-emne fordelinger).
+
+## LDA algoritmen (3.5)
+
+Forestil dig dette simple eksempel:
+
+    Tekst:
+    ”Regeringen vedtog ny lovgivning efter valget.”
+
+Antag, at vi har to emner:
+
+    Emne A (politik): ”regering”, ”valg”, ”lovgivning”
+    Emne B (sport): ”kamp”, ”mål”, ”sejr”
+
+Initialisering:
+
+    Vi tildeler tilfældigt emner til ord, fx:
+        ”regeringen”: emne B
+        ”vedtog”: emne A
+        ”ny”: emne B
+        ”lovgivning”: emne A
+        ”efter”: emne B
+        ”valget”: emne B
+
+Iteration:
+
+Vi tager ét ord ad gangen, fjerner dets aktuelle emne og spørger:
+
+    Hvor sandsynligt er ordet under hvert emne?
+        ”regeringen” optræder mest med ”valg”, ”lovgivning” osv. → politik sandsynligt.
+        ”mål” og ”sejr” ses ikke nær ”regeringen” → sport mindre sandsynligt.
+
+    Hvor sandsynligt er hvert emne i dette dokument?
+        Flest ord handler allerede om politik → emne A (politik) sandsynligt.
+
+Efter flere iterationer flytter ordene sig langsomt over i mere passende emner. Sandsynlighederne bliver mere præcise og stabile.
+Efter mange iterationer får vi:
+
+    ”regeringen” → Emne A (politik) med høj sandsynlighed.
+    ”lovgivning” → Emne A (politik)
+    ”valget” → Emne A (politik)
+    ”mål”, ”sejr” → Emne B (sport) (hvis teksten indeholdt dem)
+
+🎯 Konvergens og Resultater
+
+Når algoritmen gentager denne proces mange gange, opstår:
+
+    Stabile emne-ord fordelinger:
+    Vi kan se tydelige emner som fx ”politik”, ”sport”, ”økonomi”, osv.
+
+    Klare dokument-emne fordelinger:
+    Dokumenter får tydelige proportioner af hvert emne.
 
 
+## L`D`A algoritmen (3.6)
+
+I LDA bruges Dirichlet-fordelingen som prior, dvs. en startantagelse om, hvordan fordelingerne bør se ud:
+
+    Iteration efter iteration opdaterer algoritmen fordelingerne af emner i dokumenter (θθ) og fordelinger af ord i emner (ϕϕ).
+    Til sidst stabiliserer disse fordelinger sig omkring værdier, der passer bedst med data.
+
+Så Dirichlet-fordelingen hjælper algoritmen med at finde realistiske og stabile fordelinger af ord og emner.
+
+Dirichlet-fordelingen bruges i LDA, fordi den er specielt designet til fordelinger over proportioner (der summerer til 1).
+α-parametrene bestemmer graden af sparsommelighed eller ligelighed i fordelingerne.
+I praksis fungerer Dirichlet-fordelingen som en startantagelse, der opdateres iterativt i LDA-processen, hvilket fører til mere realistiske og meningsfulde emner.
+
+Hvorfor Dirichlet-fordelingen bruges i LDA (Intuition)
+
+I LDA modellerer vi sandsynligheder eller proportioner, fx:
+
+    Dokumenter indeholder forskellige emner med forskellige proportioner.
+    Emner indeholder forskellige ord med forskellige proportioner.
+
+Disse proportioner skal opfylde følgende:
+
+    Alle proportioner er positive eller nul.
+    Alle proportioner skal summere til 1 (fx 40% politik + 30% sport + 30% økonomi = 100%).
+
+Dirichlet-fordelingen er netop designet til at modellere denne slags proportioner, fordi den definerer en sandsynlighedsfordeling over proportioner, der summerer til én.
+
+Dirichlet-fordelingen er en sandsynlighedsfordeling over vektorer af proportioner. Matematikken:
+
+En tilfældig vektor θ=(θ1,θ2,…,θK) følger en Dirichlet-fordeling med parametre α=(α1,α2,…,αK), hvis sandsynlighedstæthedsfunktionen (PDF) er givet ved:
+
+$$
+f(\theta; \alpha) = \frac{\Gamma\left(\sum_{i=1}^{K}\alpha_i\right)}{\prod_{i=1}^{K}\Gamma(\alpha_i)} \prod_{i=1}^{K}\theta_i^{\alpha_i - 1}
+$$
+
+Hver parameter αiαi​ kan tænkes som en "prior count" eller ”forventet vægt” på kategori/emne ii:
+
+    Lav α (fx α < 1):
+        Sandsynlighedsfordelingen koncentreres omkring få emner.
+        Resultatet: ét eller få emner dominerer (sparsom fordeling).
+
+    α omkring 1 (fx α = 1):
+        Emnerne er omtrent ens sandsynlige.
+        Resultatet: Mere tilfældige og jævne emnefordelinger.
+
+    α højere end 1 (fx α > 1):
+        Mere jævnt fordelt på tværs af alle emner.
+        Resultatet: Dokumenter har ofte en mere ligelig blanding af mange emner.
+
+Kort sagt, α styrer altså, hvor meget variation og sparsommelighed der er i fordelingerne.
+
+LDA bruger Dirichlet-fordelingen to steder:
+
+    Dokument-emne-fordelingen (θθ):
+    Hvert dokument dd vælger en fordeling over emner fra en Dirichlet-fordeling:
+    θd​∼Dirichlet(α)
+
+    Emne-ord-fordelingen:
+    Hvert emne vælger en fordeling over ord fra en Dirichlet-fordeling med parameter ββ:
+    ϕk​∼Dirichlet(β)
+
+I praksis betyder dette, at LDA starter med:
+
+    At gætte en tilfældig blanding af emner i hvert dokument (styret af αα).
+    At vælge en tilfældig sammensætning af ord inden for hvert emne (styret af ββ).
+
+
+
+Forestil dig, at vi har 3 emner (fx Politik, Sport, Økonomi):
+
+Lad os vælge forskellige α-parametre:
+Eksempel A (α = [1, 1, 1])
+
+    Emnerne er lige sandsynlige.
+    Sandsynlige blandinger:
+    (0.33, 0.33, 0.33), (0.4, 0.3, 0.3), (0.3, 0.3, 0.4) osv.
+
+Eksempel B (α = [0.1, 0.1, 0.1])
+
+    Meget sparsomme fordelinger.
+    Resultatet vil typisk være: [0.95, 0.04, 0.01] – ét emne dominerer helt.
+
+Eksempel C (α = [10, 10, 10])
+
+    Meget jævne fordelinger: [0.34, 0.33, 0.33].
+    Ingen emner er klart dominerende, vi får en jævn fordeling.
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import dirichlet
+
+# α-parametre (prøv at ændre disse!)
+alpha = [1, 1, 1]
+
+# Generer data fra Dirichlet-fordelingen
+samples = dirichlet.rvs(alpha, size=5000)
+
+# Visualisering
+fig = plt.figure(figsize=(7, 6))
+ax = fig = plt.figure().add_subplot(projection='3d')
+ax = plt.axes(projection='3d')
+
+ax.scatter(samples[:,0], samples[:,1], samples[:,2], c='green', marker='o', alpha=0.3)
+ax.set_xlabel('Emne 1')
+ax.set_ylabel('Emne 2')
+ax.set_zlabel('Emne 3')
+
+plt.title('Dirichlet-fordeling med α = [1, 1, 1]')
+plt.show()
+
+```
 
 ## Fordele og ulemper: opsummering 
 
