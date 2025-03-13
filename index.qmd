@@ -1,0 +1,483 @@
+---
+title: "Topic Modeling"
+encoding: "UTF-8"
+execute:
+  echo: false
+format:
+  revealjs:
+    slide-number: c
+    show-slide-number: print
+    embed-resources: true
+    self-contained-math: true
+    smaller: true
+    scrollable: true
+    theme: dark 
+    html-math-method:
+      method: mathjax
+      url: "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML"
+    footer: "Jeppe F. Qvist | 18. marts 2025"
+---
+
+## Dagens program 
+
+1. Introduktion til Topic Modeling med særligt fokus på LDA. 
+
+2. LDA i praksis.
+
+*Til denne forelæsning introduceres topic modeling. Topic models er usuperviseret maskinlæringsmodeller, der har til formål at udlede temaer af tekster baseret på ord, der går igen på tværs af tekster. Der findes forskellige algoritmer til og varianter af topic modeling, men til denne undervisningsgang fokuseres på den mest almindelige algoritme/model kaldet Latent Dirichlet allocation (LDA). Det bliver både gennemgået, hvordan modellen fungerer samt hvordan man anvender disse i Python med pakken gensim.*
+
+::: {style="font-size: 75%;"}
+
+- Asmussen, C. B., Møller, C. (2019). Smart literature review: A practical topic modelling approach to exploratory literature review. *Journal of Big Data*, 6(1), 1-18. 
+
+- Blei, D. M., Ng, A. Y., Jordan, M. (2003). Latent Dirichlet Allocation. *Journal of Machine Learning Research*, 3, 993–1022. 
+
+- Blei, D. M. (2012). Probabilistic topic models. *Communications of the ACM*, 55(4), 77–84. 
+
+- Reed, C. (2012). *Latent Dirichlet Allocation: Towards a Deeper Understanding.* 
+
+:::
+
+## Topic Modeling
+
+> *Latent Dirichlet allocation*
+
+## *Topic* Modeling
+
+> **Latent** *Dirichlet allocation*
+
+## Topic Modeling: *anvendelsesmuligheder*
+
+Topic modellering er en ML metode, der kan afdække `skjulte` topics eller tematikker i en stor samling tekst dokumenter. 
+
+- **Dokument-"klynger"**: automatisk gruppering af tekster i kategorier. 
+
+- **Indholdsanbefaling**: find (og grupper) tekster, der ligner hinanden med henblik på abefaling. "Vi tror du vil kunne lide ... "
+
+- **Informationssøgning**: Forbedring af søgninger, vil også at inkludere ligende tekster. 
+
+- **Opsummeringer**: Lav overblik over hvilke topics er de mest fremkomne. 
+
+- **Monoterering**: Automatiske overblik over trends (fx på SoMe).
+
+## Topic Modeling: *generelle begrænsninger*
+
+- **Tolkning**: Topics er typiske abstrakte og kræver en kvalitativ (menneskelig) evaluering. 
+
+- **Parameter-sensitivitet**: Modeller kan være sensitive overfor hvordan vi specificere modellen (fx antallet af topics, som vi selv skal angive).
+
+- **Bag-of-Words antagelse**: Traditionelle topic modeller arbejder med BoW representation af tekst (mere herom snart). I næste forelæsning lærer Kristian jer om, hvordan i "overkommer" dette med nyere tilgange. 
+
+## Topic Modeling
+
+> ***Usuperviseret makinlæringsmodel***
+
+## Topic modeling (1)
+
+> ***Usuperviseret makinlæringsmodel***
+
+> Hvad er målet i usurperviseret ML? 
+
+## Topic modeling (2)
+
+> ***Usuperviseret makinlæringsmodel***
+
+> Hvad er målet i usurperviseret ML? 
+
+::: {style="font-size: 75%;"}
+::: {.incremental}
+
+Pointer fra Rolfs anden forelæsning (***Hvad er machine learning?***): 
+
+1. I usuperviseret ML er målet helt enkelt: *kompleksitetsreduktion*
+
+2. Vi har ikke nødvendigvis et klart mål til vores algoritme, vi har i stedet et ønske om, at forstå data bedre.
+
+3. Vi har spørgsmål som: (1) Hvordan er de ”rå” grupper i data? (2) Hvad ”stikker ud” når jeg viser min computer de her grupper af data? (3) Hvilken ”sekvens” gør mennesker, når de bliver sat i en bestemt situation?
+
+- Usuperviserede modeller er ofte mere ”grove” [end superviserede modeller]---vi kan ikke stille et specifikt spørgsmål til dem og deres måde at løse problemet på er, ligesom ved klassisk statistik, ved at ”æde” det data vi giver og så afleverer de et svar til os.
+
+:::
+:::
+
+## Topic modeling (3)
+
+> Hvad er *kompleksitetsreduktion*, og hvad er formålet med det? 
+
+## Topic modeling (4)
+
+> Hvad er *kompleksitetsreduktion*, og hvad er formålet med det? 
+
+::: {style="font-size: 75%;"}
+::: {.incremental}
+
+Pointer fra Rolfs tredje forelæsning (***Avanceret klyngeanalyse og datareduktion)***: 
+
+- I dag er konteksten `tekst` (ikke mennesker) og `iterative algoritmer` (probalistiske modeller; ikke rekursive algoritmer), men nogle grundlæggende ideer og principper går igen:
+
+1. Dimensioner i data er bagvedliggende faktorer, der forklarer ”ting” i data vi ellers ikke havde opdaget eller ting vi havde opdaget men fordi vi har så meget data vil tage os for evigt at forholde os til. 
+
+2. Formålet (...) er, at vi gerne vil reducere hvor ”vildt” det hele er for os. Vi kan, teknisk set, gøre det på alle former for data, men der er forskellige måder vi kan håndtere forskellige typer af data på. [Fx:]
+
+    - Klyngedannelse, i sin absolut simpleste form, er bare det---at skabe klynger af ”ting” så de giver mening som mere end entiteter. 
+
+    - I sociologien [og politiologien] er det stadig at finde ”dem der”, men computeren gør det muligt at finde ”dem der” uden at have en forudindtaget ide om, hvem ”de” er. 
+
+3. Når man taler om afstand i klyngeanalyser er det ikke en fysisk afstand, men nærmere en afstand mellem holdninger, følelser mm. [Vi kan også tale om afstande mellem tekster]
+
+:::
+:::
+
+## Latent Dirichlet allocation (1)
+
+LDA er en probabilistisk generativ model, der blev introduceret af `Blei, Ng, and Jordan (2003)`. Metoden modellere et dokuments latente topics, hvor hvert topic er repræsenteret af en ***fordeling over ord***. 
+
+::: {style="font-size: 75%;"}
+::: {.incremental}
+
+- Giver overblik over et større (*tekst*)materiale ved inddeling og kategorisering; *”utility [rather than] accuracy”* (Asmussen og Møller, 2019). 
+
+- Målet er at identificere skjulte emner i en samling af dokumenter ved at analysere ordforekomster og deres sammenhænge.
+
+    - Intuitionen er at hvert dokument repræsenteres som en blanding af emner, og hvert emne som en blanding af ord. 
+
+- Antagelse om at en tekst er udgjort af $K$ topics (modsat binære klassificeringer af tekster).
+
+    - En tekst kan være $70\%$ **topic A**, $10\%$ **topic B**, $20\%$ **topic C**
+
+- Bygger på en ”bag-of-words”-tilgang; antagelsen er at ordenes rækkefølge ikke er af betydning [?!]
+
+- Anvendes primært på en specifik tekstsamling, hvor den estimerede model i har begrænset anvendelighed i andre tekstsamling: altså, **lav ekstern validitet**.
+
+:::
+
+> Spg. til teksten?
+
+:::
+
+## Latent Dirichlet allocation (2)
+
+::: {.incremental}
+
+- I modsætning til traditionel klyngeanalyse, er ideen i topic modeling at hvert dokument består af flere forskellige emner i forskellige proportioner, fremfor at hvert dokument typisk kun tilhører én klynge. 
+
+- Et dokument kan derfor tilhøre flere emner på én gang, med forskellig styrke eller sandsynlighed.
+
+- En form for specialiseret klyngeanalyse. 
+
+::: 
+
+## Latent Dirichlet allocation (3)
+
+::: {.columns} 
+
+::: {.column width="70%"}
+
+![](Picture 2.png)
+
+:::
+
+::: {.column width="30%"}
+
+::: {style="font-size: 65%;"}
+
+- `Ord`, $w$: De unikke ord, der fremgår i vores samlede tekstmateriale (*vocabular*). 
+
+- `Documenter`, $\textbf{w}$: En sekvens af $N$ ord, $\{ w_{1}, \dots, w_{N} \}$. 
+
+- `Corpus`, $M$: En samling dokumenter, $\{ \textbf{w}_{1}, \dots, \textbf{w}_{N} \}$. 
+
+- `Topics`, $z_{1:K}$: Hvert topic er udtrykt som en sandsynlighedsfordeling af ord, $w$.
+
+- `Topic fordeling`, $\phi_{w,k}$: Andelen af topic $k$ i dokument $\textbf{w}$.
+
+- `emne-tildelingen for ord`, $\theta_{\textbf{w},w}$: Tildeling af topic $k$ til ord $w$ i tekst $\textbf{w}$.
+
+- `Bag-of-Word`: Vektoriceret (simplificeret) repræsentation af en tekst som en optælling af ord, der fremkommer. Ignorerer grammatik, kontekst, og rækkefølge af ord. 
+
+:::
+
+:::
+
+:::
+
+## Latent Dirichlet allocation (4)
+
+Intuitionen er at hvert dokument er "skabt" på baggrund af fordelingen af topics i teksten. Vi vil udlede den sandsynlighedsmodel, der (teoretisk) kunne have "skabt teksten".
+
+::: {.incremental}
+
+- Hvert topic er repræsenteret som sandsynligheden for at hvert ord er del af det pågældende topic. 
+
+    > **Hvis en tekst** (*repræsenteret som BoW*) **er $80\%$ "politik", $15\%$ "krig" og $5\%$ "forskning", ville en korrekt specificeret model (teoretisk) kunne genskabe denne BoW, ved at vælge $80\%$ "politik-ord", $15\%$ "krigs-ord" og $5\%$ "forsknings-ord", hvis vi gender de underliggende fordelinger af topics of ord** 
+
+- Teknisk vil vi fra vores corpus udlede de skjulte fordelinger: 
+
+    1. `Topic-word` fordelingen: *hvor sandsynligt det er for specifikke ord at optræde i hvert topic*
+
+    2. `Document-topic` fordelingen: *hvor fremtræden hvert topic er i hvert dokument*.
+
+:::
+
+## Latent Dirichlet allocation (5)
+
+> Når jeg siger at hvert *topic* i LDA er en "fordeling", hvad tror I jeg mener med det?
+
+::: {.incremental}
+
+- Hvert topic er "blot" en samling af ord, hvor hvert ord har en estimeret sandsynlighed, der indikerer hvor sandsynlige deres fremkomst er i en tekst med et givent topic. 
+
+- Topics kan også tænkes i "bag"-analogien: hvert tema er en "bag" af ord, hvor nogle er meget fremkomne i én "bag", men mindre sandsynlige i en anden "bag". 
+
+    - "Klima" er meget sandsynlig i vores *"miljø"*-topic, men fremkommer også i vores *"skole"*-topic, endog fremkomsten af ordet her er mindre sandsynligt en det første topic. 
+
+:::
+
+## Latent Dirichlet allocation (5)
+
+> **Artikel**: Regeringen med minister Y i spidsen præsenterer nye målsætninger for reducering af klimapåvirkning fra landbruget. 
+
+1. Topic 1: *Politik* ($60\%$): regering, målsætning*, minister, reducering, landbrug, $\dots$
+
+2. Topic 2: *Klima* ($40\%$): klima*, landbrug, reducering, $\dots$ 
+
+::: {style="font-size: 65%;"}
+
+| Ord            | Sandsynlighed (Hvor ofte?) | Forklaring                                   |
+|----------------|-----------------------------|---------------------------------------------|
+| Klima          | Høj                         | Ofte centralt i diskussioner                |
+| Forurening     | Høj                         | Hyppigt omtalt miljøproblem                 |
+| Genbrug        | Middel-høj                  | Almindeligt, men mindre centralt end "klima" |
+| Bæredygtighed  | Middel                      | Vigtigt, men mindre hyppigt                 |
+| Plastik        | Middel                      | Ofte relateret til affald og forurening     |
+| Vedvarende     | Middel-lav                  | Forekommer i energirelaterede diskussioner  |
+| Økosystem      | Middel-lav                  | Vigtigt, men specialiseret                  |
+| Udledninger    | Lav                         | Teknisk, specifikke sammenhænge             |
+| Solenergi      | Lav                         | Mere specialiseret del af miljøområdet      |
+
+: Hyppighed af ord i Klima-topic {tbl-cap}
+
+:::
+
+## Inferens: hvordan "lærer" LDA (1)
+
+::: {.columns} 
+
+::: {.column width="70%"}
+
+![](Picture 2.png)
+
+:::
+
+::: {.column width="30%"}
+
+::: {style="font-size: 65%;"}
+
+::: {.incremental}
+
+- Vi vil udlede den sandsynlighedsmodel, der (teoretisk) kunne have "skabt teksten".
+
+- Konceptuelt, og i praksis, vil vi "reverse-engineer" denne generative proces, der kunne have skabt teksten, ved at estimere de skjulte fordelinger i data: 
+
+    1. `Topic-word` fordelingen, $\phi$: *hvor sandsynligt det er for specifikke ord at optræde i hvert topic*
+
+    2. `Document-topic` fordelingen, $\theta$: *hvor fremtræden hvert topic er i hvert dokument*.
+
+    3. Vi bruger `Gibbs sampling` til at estimere disse fordelinger. 
+
+:::
+
+:::
+
+:::
+
+:::
+
+## Inferens: hvordan "lærer" LDA (2)
+
+LDA er en `iterativ algoritme`, der tilskriver topics ved:  
+
+::: {.incremental}
+
+::: {style="font-size: 90%;"}
+
+1. Hvor almindeligt/fremtrædende er et topic, $k$, i et givent dokument, $\textbf{w}$ (`Document-topic proportion`)
+
+2. Hvor sandsynligt er det at et ord, $w$, er en del at topic, $k$, på tværs af hele corpusset $M$ (`Topic-word likelihood`)
+
+- Algoritmen giver to outouts: 
+
+    1. `Topic-word` fordelingen, $\phi$: som dermed viser hvilket ord, $w$, definere hvert topic, $k$. 
+
+    2. `Document-topic` fordelingen, $\theta$: som viser sammensætningerne af topics, $K$, for hvert dokument, $\textbf{w}$.
+
+- Vi har nu estimeret en model, der kan: 
+
+    1. Klassificere/tilskrive topics til en tekst. 
+
+    2. Afdække de underlæggende topics i en samling dokumenter. 
+
+    3. Lave semantisk/tematisk "clustering" af dokumenter, der muliggør flere af anvendelserne, præsenteret i starten. 
+
+:::
+
+:::
+
+## LDA algoritmen (1)
+
+::: {style="font-size: 75%;"}
+
+LDA er iterativ, idet det er en proces, hvor algoritmen laver en gradvis "forbedring" af resultaterne (fordelingerne)---gører tilpasningsdelen igen og igen---indtil den finder en stabil løsning (konvergerer), hvor hver gentagelse kun ændrer resultaterne minimalt. Ved dette punkt har algoritmen har fundet et stabilt sæt af topics. 
+
+```
+
+~~Stiliseret iterativ algoritme~~ 
+Input: Et sæt af dokumenter D, antal ønskede topics K
+Output: Document-topic-fordeling og Topic-word-fordeling
+
+Start:
+    Initialisér tilfældigt et topic for hvert ord i alle dokumenter
+
+    Gentag
+        For hvert dokument W i M:
+            For hvert ord w i dokument W:
+                Fjern det nuværende topic k for ordet w
+
+                For hvert topic k fra 1 til K:
+                    Beregn sandsynlighed P(k) baseret på:
+                        a. Hvor hyppigt topic k optræder i dokument W (Document-topic-fordeling)
+                        b. Hvor sandsynligt ordet w er under topic k (Topic-word-fordeling)
+
+                Vælg nyt topic k' til ordet w baseret på sandsynlighedsfordelingen P(k)
+
+                Tildel det nye topic k' til ordet w
+
+        Opdater Document-topic-fordeling og Topic-word-fordeling baseret på nye topic-tildelinger
+
+    Indtil (konvergens nås: ændringerne mellem iterationer er minimale)
+
+Returnér Document-topic-fordeling og Topic-word-fordeling
+Slut
+
+```
+
+:::
+
+## LDA algoritmen (2)
+
+
+Topic models see text as generated from probabilistic distributions:
+
+- uncovering hidden semantic structures in textual data. It relies heavily on probabilistic and mathematical foundations, such as the Dirichlet and multinomial distributions.
+
+- Multinomial distribution: Used for modeling discrete counts of words.
+
+- Dirichlet distribution: A family of continuous multivariate probability distributions often used as a prior for multinomial distributions.
+
+- The Dirichlet distribution is useful because it is the conjugate prior to the multinomial distribution. This mathematical convenience simplifies Bayesian inference significantly.
+
+$$
+\text{Dir}(\theta|\alpha) = 
+\frac{\Gamma\left(\sum_{i=1}^{K}\alpha_i\right)}{\prod_{i=1}^{K}\Gamma(\alpha_i)} \prod_{i=1}^{K} x_i^{\alpha_i - 1}
+$$
+
+Hvor, 
+
+$$
+1+1
+$$
+
+## LDA algoritmen (3)
+
+- LDA assumes that each document is generated from a mixture of topics, and each topic is a distribution over words.
+
+How LDA works:
+
+    Each document dd is assumed to have a topic distribution θdθd​.
+    Each topic tt has a word distribution ϕtϕt​.
+
+    The generative process (simplified):
+
+    For each document dd, choose a topic distribution θd∼Dir(α)θd​∼Dir(α).
+    For each topic tt, choose a word distribution ϕt∼Dir(β)ϕt​∼Dir(β).
+    For each word wdnwdn​ in document dd:
+        Choose a topic zdn∼Multinomial(θd)zdn​∼Multinomial(θd​).
+        Choose a word wdn∼Multinomial(ϕzdn)wdn​∼Multinomial(ϕzdn​​).
+
+LDA inference aims at finding these hidden distributions from observed data. Exact inference is computationally infeasible, so approximation methods are used:
+
+    Gibbs Sampling (a type of Markov Chain Monte Carlo)
+    Variational Inference
+
+Mathematically, LDA tries to maximize the posterior probability:
+
+Since this posterior is complex and hard to compute exactly, algorithms such as Variational Inference or Gibbs Sampling (Markov Chain Monte Carlo) are used to approximate it.
+
+LDA relies on probability distributions:
+
+    Dirichlet Distribution:
+    Controls how evenly distributed (or sparse) topics or words are.
+        A high value creates evenly mixed distributions (each topic has many words).
+        A low value creates sparse distributions (topics focus on fewer words).
+
+    Multinomial Distribution:
+    Models choosing a topic or word based on probabilities (like rolling a weighted dice).
+
+Simplified Generative Process:
+
+    For each document:
+        Choose a topic distribution (using Dirichlet).
+        For each word:
+            Choose a topic from the document’s topic distribution.
+            Choose a word from the chosen topic’s word distribution.
+
+    Don’t worry if the math seems complicated. The key takeaway:
+
+        Topics and Documents have probabilities.
+        Words come from these probability distributions.
+
+
+
+## Fordele og ulemper: opsummering 
+
+
+
+Strengths of LDA
+Clear Probabilistic Interpretation:
+
+    LDA's explicit probabilistic formulation makes it interpretable and easy to understand mathematically.
+
+Simple Implementation and Efficiency:
+
+    Fast, mature implementations (e.g., Gensim, MALLET, Scikit-learn) are readily available.
+    Scales well to large datasets with Gibbs sampling or variational inference.
+
+Robustness and Flexibility:
+
+    Effective even with relatively small datasets.
+    Clear mechanisms (via priors αα and ββ) to control topic sparsity.
+
+Human-readable Outputs:
+
+    Topics represented as easily interpretable distributions over words.
+
+Weaknesses of LDA
+Bag-of-Words Limitation:
+
+    LDA disregards word order and semantics, relying solely on word frequencies and co-occurrences.
+    Cannot distinguish nuanced semantic differences or polysemy (words with multiple meanings).
+
+Sensitive to Hyperparameters and Number of Topics:
+
+    Choosing the number of topics KK and hyperparameters αα and ββ often involves trial-and-error or heuristics.
+
+Difficulties Handling Short Texts:
+
+    Documents with fewer words (e.g., tweets) offer less statistical evidence, resulting in poorer topic quality.
+
+Context Insensitivity:
+
+    Unable to leverage linguistic or semantic context. For example, "apple" (fruit vs. company) is ambiguous in LDA.
+
+
+# LDA i praksis
