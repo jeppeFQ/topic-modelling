@@ -421,7 +421,7 @@ Go through each place and person over and over again. Your guesses keep getting 
 Vi bruger en afart af `Bayes Theorem` til LDA, hvor vi opdaterer modellens parametre ($\theta, \phi, z$), ved at observere data, ordene, $w$:
 
 $$
-P(\theta, \phi, z \mid w, \alpha, \beta) = \frac{P(w \mid z, \phi)P(z \mid \theta)P(\theta \mid \alpha)P(\phi \mid \beta)}{P(w \mid \alpha, \beta)}
+P(\theta, \phi, z \mid w, \alpha, \beta) = \frac{P(w \mid z, \phi)~P(z \mid \theta)~P(\theta \mid \alpha)~P(\phi \mid \beta)}{P(w \mid \alpha, \beta)}
 $$
 
 Hvor, 
@@ -443,8 +443,9 @@ Hvor,
 Vi bruger en afart af `Bayes Theorem` til LDA, hvor vi opdaterer modellens parametre ($\theta, \phi, z$), ved at observere data, ordene, $w$:
 
 $$
-P(\theta, \phi, z \mid w, \alpha, \beta) = \frac{P(w \mid z, \phi)P(z \mid \theta)P(\theta \mid \alpha)P(\phi \mid \beta)}{P(w \mid \alpha, \beta)}
+P(\theta, \phi, z \mid w, \alpha, \beta) = \frac{P(w \mid z, \phi)~P(z \mid \theta)~P(\theta \mid \alpha)~P(\phi \mid \beta)}{P(w \mid \alpha, \beta)}
 $$
+
 
 ::: {.incremental}
 
@@ -463,7 +464,7 @@ $$
 Vi bruger en afart af `Bayes Theorem` til LDA, hvor vi opdaterer modellens parametre ($\theta, \phi, z$), ved at observere data, ordene, $w$:
 
 $$
-P(\theta, \phi, z \mid w, \alpha, \beta) = \frac{P(w \mid z, \phi)P(z \mid \theta)P(\theta \mid \alpha)P(\phi \mid \beta)}{P(w \mid \alpha, \beta)}
+P(\theta, \phi, z \mid w, \alpha, \beta) = \frac{P(w \mid z, \phi)~P(z \mid \theta)~P(\theta \mid \alpha)~P(\phi \mid \beta)}{P(w \mid \alpha, \beta)}
 $$
 
 ::: {.incremental}
@@ -472,7 +473,7 @@ $$
 
     - <p><span style="font-size:0.7em">*Vi starter med en antagelse om, hvordan topics typisk fordeler sig i dokumenter (bestemt af \alpha). Denne antagelse justeres iterativt, når vi ser på data.*</span></p>
 
-- $P(\psi|\beta)$ er sandsynligheden for topic-word fordelingen $\psi$, givet *Dirichlet-fordelingen* med hyperparametre $\beta$.
+- $P(\phi|\beta)$ er sandsynligheden for topic-word fordelingen $\psi$, givet *Dirichlet-fordelingen* med hyperparametre $\beta$.
 
     - <p><span style="font-size:0.7em">*Vi starter med en antagelse om, hvordan ordene typisk fordeler sig i topics (bestemt af $\beta$). Denne antagelse justeres iterativt ud fra data.*</span></p>
 
@@ -483,8 +484,9 @@ $$
 Vi bruger en afart af `Bayes Theorem` til LDA, hvor vi opdaterer modellens parametre ($\theta, \phi, z$), ved at observere data, ordene, $w$:
 
 $$
-P(\theta, \phi, z \mid w, \alpha, \beta) = \frac{P(w \mid z, \phi)P(z \mid \theta)P(\theta \mid \alpha)P(\phi \mid \beta)}{P(w \mid \alpha, \beta)}
+P(\theta, \phi, z \mid w, \alpha, \beta) = \frac{P(w \mid z, \phi)~P(z \mid \theta)~P(\theta \mid \alpha)~P(\phi \mid \beta)}{P(w \mid \alpha, \beta)}
 $$
+
 
 ::: {.incremental}
 
@@ -497,14 +499,19 @@ $$
 Vi bruger en afart af `Bayes Theorem` til LDA, hvor vi opdaterer modellens parametre ($\theta, \phi, z$), ved at observere data, ordene, $w$:
 
 $$
-P(\theta, \phi, z \mid w, \alpha, \beta) = \frac{P(w \mid z, \phi)P(z \mid \theta)P(\theta \mid \alpha)P(\phi \mid \beta)}{P(w \mid \alpha, \beta)}
+P(\theta, \phi, z \mid w, \alpha, \beta) = \frac{P(w \mid z, \phi)~P(z \mid \theta)~P(\theta \mid \alpha)~P(\phi \mid \beta)}{P(w \mid \alpha, \beta)}
 $$
+
 
 Formlen beskriver, hvordan LDA bruger data (ordene i teksterne) og prior antagelser (hyperparametrene) til iterativt at finde og opdatere topics og deres fordelinger.
 
-Den gør dette iterativt, indtil ***sandsynligheden for at observere vores data*** (givet de modellerede topis) bliver maksimal---og resultatet bliver en meningsfuld ***inddeling af store tekster i skjulte topics***.
+::: {.incremental}
 
-Grundlæggende vil vi finde de værdier for $\theta$, $\phi$ og $z$, der gør, at sandsynligheden for de pågældende topic-inddelinger bliver størst muligt (maksimering af ***posterior-sandsynligheden***).
+- Den gør dette iterativt, indtil ***sandsynligheden for at observere vores data*** (givet de modellerede topis) bliver maksimal---og resultatet bliver en meningsfuld ***inddeling af store tekster i skjulte topics***.
+
+- Grundlæggende vil vi finde de værdier for $\theta$, $\phi$ og $z$, der gør, at sandsynligheden for de pågældende topic-inddelinger bliver størst muligt (maksimering af ***posterior-sandsynligheden***).
+
+:::
 
 ## LDA algoritmen (3.5)
 
@@ -528,7 +535,9 @@ Et hypotetisk output:
 
     - Disse proportioner giver os endeligt meningsfulde topics med meningsfulde ord (topic-word fordelingen) og en bestemmelse af proportionerne af topics i hver tekst (document-topic fordelingen).
 
-    - Spg.: ***Hvad vil "meningsfuld" i denne kontekst sige?***
+        - Spg.: ***Hvad vil "meningsfuld" i denne kontekst sige?***
+
+<span class="timer" data-time="120"></span>
 
 :::
 
@@ -740,78 +749,19 @@ LdaModel eller LdaMulticore
 
 ## Evaluering af LDA og `hyperparameter tuning` (1)
 
-<!----
-
-Natural language is messy, ambiguous and full of subjective interpretation, and sometimes, trying to cleanse ambiguity reduces the language to an unnatural form. In this article, we’ll explore more about topic coherence, an intrinsic evaluation metric, and how you can use it to quantitatively justify the model selection.
-
-We know probabilistic topic models, such as LDA, are popular tools for text analysis, providing both a predictive and latent topic representation of the corpus. However, there is a longstanding assumption that the latent space discovered by these models is generally meaningful and useful, and that evaluating such assumptions is challenging due to its unsupervised training process. Besides, there is a no-gold standard list of topics to compare against every corpus.
-
-Nevertheless, it is equally important to identify if a trained model is objectively good or bad, as well have an ability to compare different models/methods. To do so, one would require an objective measure for the quality. Traditionally, and still for many practical applications, to evaluate if “the correct thing” has been learned about the corpus, an implicit knowledge and “eyeballing” approaches are used. Ideally, we’d like to capture this information in a single metric that can be maximized, and compared.
-
-Eyeballing Models
-
-    Top N words
-    Topics/documents
-
-Intrinsic evaluation metrics
-
-    Capturing model semantics
-    Topics interpretability
-
-Human judgements
-
-    What is a topic?
-
-Extrinsic evaluation metrics/evaluation at task
-
-    Is the model good at performing predefined tasks, such as classification?
-
-
-
-What is topic coherence?
-
-Before we understand topic coherence, let’s briefly look at the perplexity measure. Perplexity as well is one of the intrinsic evaluation metric, and is widely used for language Model Evaluation. It captures how surprised a model is by new data it has not seen before and is measured as the normalized log-likelihood of a held-out test set.
-
-Focussing on the log-likelihood part, you can think of the perplexity metric as measuring how probable some new unseen data is given the model that was learned earlier. That is to say, how well does the model represent or reproduce the statistics of the held-out data?
-
-However, recent studies have shown that predictive likelihood (or equivalently, perplexity) and human judgment are often not correlated, and even sometimes slightly anti-correlated.
-
-    Optimizing for perplexity may not yield human-interpretable topics.
-
-This limitation of perplexity measure served as a motivation for more work trying to model the human judgment and, thus, Topic Coherence.
-
-The concept of topic coherence combines a number of measures into a framework to evaluate the coherence between topics inferred by a model. But before that…
-
-What is topic coherence?
-
-Topic Coherence measures score a single topic by measuring the degree of semantic similarity between high scoring words in the topic. These measurements help distinguish between topics that are semantically interpretable topics and topics that are artifacts of statistical inference. But …
-
-What is coherence?
-
-A set of statements or facts is said to be coherent, if they support each other. Thus, a coherent fact set can be interpreted in a context that covers all or most of the facts. An example of a coherent fact set is “the game is a team sport”, “the game is played with a ball”, “the game demands great physical efforts.”
-Coherence measures
-
-Let’s take quick look at different coherence measures, and how they are calculated:
-
-    C_v measure is based on a sliding window, one-set segmentation of the top words and an indirect confirmation measure that uses normalized pointwise mutual information (NPMI) and the cosine similarity
-    C_p is based on a sliding window, one-preceding segmentation of the top words and the confirmation measure of Fitelson’s coherence
-    C_uci measure is based on a sliding window and the pointwise mutual information (PMI) of all word pairs of the given top words
-    C_umass is based on document cooccurrence counts, a one-preceding segmentation and a logarithmic conditional probability as confirmation measure
-    C_npmi is an enhanced version of the C_uci coherence using the normalized pointwise mutual information (NPMI)
-    C_a is baseed on a context window, a pairwise comparison of the top words and an indirect confirmation measure that uses normalized pointwise mutual information (NPMI) and the cosine similarity
-
-There is, of course, a lot more to the concept of topic model evaluation, and the coherence measure. However, keeping in mind the length, and purpose of this article, let’s apply these concepts into developing a model that is at least better than with the default parameters. Also, we’ll be re-purposing already available online pieces of code to support this exercise instead of re-inventing the wheel.
-
----->
-
-## Evaluering af LDA og `hyperparameter tuning` (2)
-
+- 
 
 <!----
 
-Evaluation¶
+evaluating is challenging due to its unsupervised training process. Besides, there is a no gold standard list of topics to compare against every corpus.
 
-Evaluating an LDA (Latent Dirichlet Allocation) model is an important step in topic modeling to determine the effectiveness of the model in discovering underlying topics in a corpus of text documents. There are several methods for evaluating an LDA model, including:
+determine the effectiveness of the model in discovering underlying topics in a corpus of text documents.
+
+Nevertheless, it is equally important to identify if a trained model is objectively good or bad, as well have an ability to compare different models/methods. ... evaluate if “the correct thing” has been learned about the corpus.
+
+Human judgements: What is a topic?
+
+There are several methods for evaluating an LDA model, including:
 
     Perplexity: Perplexity is a commonly used metric for evaluating LDA models. It measures how well the model predicts new data. A lower perplexity score indicates better performance. You can calculate perplexity using the log_perplexity() method of the LDA model in gensim.
 
@@ -821,35 +771,26 @@ Evaluating an LDA (Latent Dirichlet Allocation) model is an important step in to
 
     Human evaluation: Finally, you can also perform human evaluation by having human annotators review the topics generated by the LDA model and provide feedback on the quality and interpretability of the topics.
 
-In summary, evaluating an LDA model involves using one or more of the above methods to measure the quality of the topics generated by the model. By evaluating the model, you can make adjustments to the parameters and improve the quality of the topics.
+---->
+
+<span class="timer" data-time="180"></span>
 
 
+## Evaluering af LDA og `hyperparameter tuning` (2)
 
 
-Hyperparameter Tuning¶
+<!----
 
-First, let’s differentiate between model hyperparameters and model parameters :
+Hyperparameter Tuning
+
+    Model hyperparameters can be thought of as settings for a machine learning algorithm that are tuned by the data scientist before training. Examples would be the number of trees in the random forest, or in our case, number of topics K
+
+
+perform a series of sensitivity tests to help determine the following model hyperparameters:
 
     Number of Topics (K)
     Dirichlet hyperparameter alpha: Document-Topic Density
     Dirichlet hyperparameter beta: Word-Topic Density
-
-
-Hyperparameter tuning
-
-First, let’s differentiate between model hyperparameters and model parameters:
-
-    Model hyperparameters can be thought of as settings for a machine learning algorithm that are tuned by the data scientist before training. Examples would be the number of trees in the random forest, or in our case, number of topics K
-
-    Model parameters can be thought of as what the model learns during training, such as the weights for each word in a given topic
-
-Now that we have the baseline coherence score for the default LDA model, let’s perform a series of sensitivity tests to help determine the following model hyperparameters:
-
-    Number of topics (K)
-    Dirichlet hyperparameter alpha: Document-topic density
-    Dirichlet hyperparameter beta: Word-topic density
-
-We’ll perform these tests in sequence, one parameter at a time by keeping others constant and run them over the two different validation corpus sets. We’ll use C_v as our choice of metric for performance comparison.
 
 --->
 
