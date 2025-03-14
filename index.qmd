@@ -51,6 +51,12 @@ Topic modeling is a technique used in natural language processing and machine le
 
 One popular algorithm for topic modeling is Latent Dirichlet Allocation (LDA), which is based on a probabilistic model of document generation. LDA assumes that each document is a mixture of several topics, and each topic is a probability distribution over a fixed set of words.
 
+Latent Dirichlet Allocation (LDA) is a popular probabilistic topic modeling algorithm.
+
+    The basic idea behind LDA is to represent a collection of documents as a mixture of latent topics, where each topic is a probability distribution over words. The goal of LDA is to learn these latent topics and their associated word distributions from the documents.
+
+    LDA assumes that each document in the collection is generated from a mixture of K topics, where K is a predefined number of topics. Each topic is represented as a probability distribution over words, and each word in a document is generated from one of the K topics according to a probability distribution.
+
 --->
 
 ## *Topic* Modeling
@@ -338,7 +344,7 @@ LDA er en `iterativ algoritme`, der tilskriver topics ved:
 
 :::
 
-## LDA algoritmen (1)
+## LDA algoritmen (1.1)
 
 ::: {style="font-size: 75%;"}
 
@@ -375,6 +381,38 @@ Returnér Document-topic-fordeling og Topic-word-fordeling
 Slut
 
 ```
+
+:::
+
+## LDA algoritmen (1.2)
+
+**Hvordan virker algoritmen? (e.g., p. 1005 i Blei et al., 2003): *Inferens af posteriour distributions*.**
+
+::: {style="font-size: 50%;"}
+
+Suppose you’ve just moved to a new city. You’re a hipster and an anime fan, so you want to know where the other hipsters and anime geeks tend to hang out. Of course, as a hipster, you know you can’t just ask, so what do you do?
+
+Here’s the scenario: you scope out a bunch of different establishments (documents) across town, making note of the people (words) hanging out in each of them (e.g., Alice hangs out at the mall and at the park, Bob hangs out at the movie theater and the park, and so on). Crucially, you don’t know the typical interest groups (topics) of each establishment, nor do you know the different interests of each person.
+
+So you pick some number K of categories to learn (i.e., you want to learn the K most important kinds of categories people fall into), and start by making a guess as to why you see people where you do. For example, you initially guess that Alice is at the mall because people with interests in X like to hang out there; when you see her at the park, you guess it’s because her friends with interests in Y like to hang out there; when you see Bob at the movie theater, you randomly guess it’s because the Z people in this city really like to watch movies; and so on.
+
+Of course, your random guesses are very likely to be incorrect (they’re random guesses, after all!), so you want to improve on them. One way of doing so is to:
+
+- Pick a place and a person (e.g., Alice at the mall).
+
+- Why is Alice likely to be at the mall? Probably because other people at the mall with the same interests sent her a message telling her to come.
+
+- In other words, the more people with interests in X there are at the mall and the stronger Alice is associated with interest X (at all the other places she goes to), the more likely it is that Alice is at the mall because of interest X.
+
+- So make a new guess as to why Alice is at the mall, choosing an interest with some probability according to how likely you think it is.
+
+Go through each place and person over and over again. Your guesses keep getting better and better (after all, if you notice that lots of geeks hang out at the bookstore, and you suspect that Alice is pretty geeky herself, then it’s a good bet that Alice is at the bookstore because her geek friends told her to go there; and now that you have a better idea of why Alice is probably at the bookstore, you can use this knowledge in turn to improve your guesses as to why everyone else is where they are), and eventually you can stop updating. Then take a snapshot (or multiple snapshots) of your guesses, and use it to get all the information you want:
+
+- For each category, you can count the people assigned to that category to figure out what people have this particular interest. By looking at the people themselves, you can interpret the category as well (e.g., if category X contains lots of tall people wearing jerseys and carrying around basketballs, you might interpret X as the “basketball players” group).
+
+- For each place P and interest category C, you can compute the proportions of people at P because of C (under the current set of assignments), and these give you a representation of P. For example, you might learn that the people who hang out at Barnes & Noble consist of 10% hipsters, 50% anime fans, 10% jocks, and 30% college students.
+
+[*OPRINDELIG TEKST*](blog.echen.me/2011/08/22/introduction-to-latent-dirichlet-allocation/) 
 
 :::
 
@@ -551,6 +589,16 @@ Parametrene $\alpha_{i}$ er vores "prior count" for topics (som vi selv vælger)
 
 - $\alpha > 1$: Jævn fordeling på tværs af alle topics. Tekster har ofte en ligelig blanding af mange topics.
 
+<!---
+    For, the higher values of alpha —> the documents will be composed of more topics, and
+    The lower values of alpha —> returns documents with fewer topics.
+
+Similarly, for the values of Beta:
+
+    The higher beta —> has more number of words in a given topic, and
+    The lower value of beta —> topics contains few words.
+---->
+
 :::
 
 ::: 
@@ -653,130 +701,114 @@ Hvis vores tekster er korte, eller det bliver tydeligt at semantik og kontekst e
 
 - Implementering af LDA i Pythin
 
-## Vektorisering af tekst 
+## Vektorisering af tekst til `Bag-of-Words`
 
-<!-----
+Preprocessing: 
 
-Preprocessing
+1. Fjern stopord
+2. Fjern tegnsætning
+3. Fjern tal 
+4. Lemmatization
 
-we will use Spacy for text cleaning:
+- *Hvad mere?*
 
-    Remove stope words
-    Remove punctuation
-    Remove spaces
-    Keep only letters
-    keep only Nouns, Verbs, Adjectives, Adverbs
-    Return lemmatization form of the words
+::: {.incremental}
 
+- Konstruér `document-term-matrix` (DTM)
 
+:::
 
+<span class="timer" data-time="120"></span>
 
-    Convert the text into lowercase
-    Split text into words
-    Remove the stop loss words
-    Remove the Punctuation, any symbols, and special characters
-    Normalize the word (I’ll be using Lemmatization for normalization)
+## `Gensim` implementering af LDA
 
-    The next step is to convert the corpus (the list of documents) into a document-term Matrix using the dictionary that we had prepared above. (The vectorizer used here is the Bag of Words).
+Base model: 
 
+```
+LdaModel eller LdaMulticore
+```
 
-    After preprocessing the text, we don’t need to explicitly create the document term matrix (DTM). Gensim package has an internal mechanism to create the DTM.
-This output implies:
-
-    Document wise we have the index of the word and its frequency.
-    The 0th word is repeated 1 time, then the 1st word repeated 1, and so on …
-
-For gensim: Using gensim for Document Term Matrix(DTM), we don’t need to explicitly create the DTM matrix from scratch. The gensim library has an internal mechanism to create the DTM.
-For sklearn: Use either the Count vectorizer or TF-IDF vectorizer to transform the Document Term Matrix (DTM) into numerical arrays.
-
----->
-
-## Implementering af LDA 
-
-<!----
-
-LDA with Gensim
-
-Latent Dirichlet Allocation (LDA) is a popular probabilistic topic modeling algorithm.
-
-    The basic idea behind LDA is to represent a collection of documents as a mixture of latent topics, where each topic is a probability distribution over words. The goal of LDA is to learn these latent topics and their associated word distributions from the documents.
-
-    LDA assumes that each document in the collection is generated from a mixture of K topics, where K is a predefined number of topics. Each topic is represented as a probability distribution over words, and each word in a document is generated from one of the K topics according to a probability distribution.
-
-The LDA algorithm uses an iterative process to learn the latent topics and their associated word distributions. The basic steps of the algorithm are:
-
-    Initialize the topic assignments for each word in each document randomly. For each document:
-        Compute the topic proportions for the document based on the current topic assignments.
-        For each word in the document:
-        Compute the probability of each topic generating the word based on the current topic proportions and word distribution.
-        Assign the word to a new topic based on these probabilities. Repeat steps 2 and 3 until convergence.
-    Once the algorithm has converged, the learned topic distributions can be used to identify the most important topics in the collection and the words that are most strongly associated with each topic.
-
-Gensim will go through the process of finding the best word distribution for each topic, and best topic distribution for each document.
-
+```
     Input:
-        Document-term matrix, a Bag-Of-Words (BOW) format.
-        Number of topics
-        Numper of iterations
+        Document-term matrix: Bag-Of-Words (BOW) format.
+        Number of topics: K
+        Numper of iterations [epochs]: N
+        alpha, document-topic density: 'auto' 
+        eta [beta], topic word density: 'auto' 
     Output: the top words in each topic
+```
 
+## Evaluering af LDA og `hyperparameter tuning` (1)
 
-we pass the vectorized corpus to the LDA model for both the packages gensim and sklearn.
+<!----
 
+Natural language is messy, ambiguous and full of subjective interpretation, and sometimes, trying to cleanse ambiguity reduces the language to an unnatural form. In this article, we’ll explore more about topic coherence, an intrinsic evaluation metric, and how you can use it to quantitatively justify the model selection.
 
+We know probabilistic topic models, such as LDA, are popular tools for text analysis, providing both a predictive and latent topic representation of the corpus. However, there is a longstanding assumption that the latent space discovered by these models is generally meaningful and useful, and that evaluating such assumptions is challenging due to its unsupervised training process. Besides, there is a no-gold standard list of topics to compare against every corpus.
 
-    Next, we implement the LDA model by creating the object and passing the required arguments:
+Nevertheless, it is equally important to identify if a trained model is objectively good or bad, as well have an ability to compare different models/methods. To do so, one would require an objective measure for the quality. Traditionally, and still for many practical applications, to evaluate if “the correct thing” has been learned about the corpus, an implicit knowledge and “eyeballing” approaches are used. Ideally, we’d like to capture this information in a single metric that can be maximized, and compared.
 
-This output means: each of the 52 unique words is given weights based on the topics. In other words, it implies which of the words dominate the topics.
+Eyeballing Models
 
-    Now, we find the topics from Corpus:
+    Top N words
+    Topics/documents
 
-This returns the following six topics (indexed from 0,1,2,3,4,5) with the five words in each of the topics along with their respective weights.
+Intrinsic evaluation metrics
 
-    Now, we assign these resultant topics to the documents via:
+    Capturing model semantics
+    Topics interpretability
 
+Human judgements
 
-Parameters for LDA model in gensim
+    What is a topic?
 
-Following are the important and commonly used parameters for LDA for implementing in the gensim package:
+Extrinsic evaluation metrics/evaluation at task
 
-    The corpus or the document-term matrix to be passed to the model (in our example is called doc_term_matrix)
-    Number of Topics: num_topics is the number of topics we want to extract from the corpus.
-    id2word: It is the mapping from word indices to words. Each of the words has an index that is present in the dictionary.
-    Number of Iterations: it is represented by Passes in Python. Another technical word for iterations is ‘epochs’. Passes control how often we want to train the model on the entire corpus for convergence.
-    Chunksize: It is the number of documents to be used in each training chunk. The chunksize controls how many documents can be processed at one time in the training algorithm.
-
-    LDA’s model parameters:
-
- 
-
-    Alpha: is the document-topic density
-    Beta: (In Python, this parameter is called ‘eta’): is the topic word density
-
-
-    For, the higher values of alpha —> the documents will be composed of more topics, and
-    The lower values of alpha —> returns documents with fewer topics.
-
-Similarly, for the values of Beta:
-
-    The higher beta —> has more number of words in a given topic, and
-    The lower value of beta —> topics contains few words.
-
-It is better to keep alpha and beta parameters as ‘auto’ because the model is automatically learning these two parameters.
+    Is the model good at performing predefined tasks, such as classification?
 
 
 
-Finally, we'll generate our base LDA model.
+What is topic coherence?
 
-Since we have a small to medium-sized dataset, we can use LdaModel for topic modeling. However, if we have a large dataset, it is recommended to use LdaMulticore to speed up the computation.
+Before we understand topic coherence, let’s briefly look at the perplexity measure. Perplexity as well is one of the intrinsic evaluation metric, and is widely used for language Model Evaluation. It captures how surprised a model is by new data it has not seen before and is measured as the normalized log-likelihood of a held-out test set.
 
-My hypothesis is that there will be 5 Topics as there was 5 seasons.
+Focussing on the log-likelihood part, you can think of the perplexity metric as measuring how probable some new unseen data is given the model that was learned earlier. That is to say, how well does the model represent or reproduce the statistics of the held-out data?
+
+However, recent studies have shown that predictive likelihood (or equivalently, perplexity) and human judgment are often not correlated, and even sometimes slightly anti-correlated.
+
+    Optimizing for perplexity may not yield human-interpretable topics.
+
+This limitation of perplexity measure served as a motivation for more work trying to model the human judgment and, thus, Topic Coherence.
+
+The concept of topic coherence combines a number of measures into a framework to evaluate the coherence between topics inferred by a model. But before that…
+
+What is topic coherence?
+
+Topic Coherence measures score a single topic by measuring the degree of semantic similarity between high scoring words in the topic. These measurements help distinguish between topics that are semantically interpretable topics and topics that are artifacts of statistical inference. But …
+
+What is coherence?
+
+A set of statements or facts is said to be coherent, if they support each other. Thus, a coherent fact set can be interpreted in a context that covers all or most of the facts. An example of a coherent fact set is “the game is a team sport”, “the game is played with a ball”, “the game demands great physical efforts.”
+Coherence measures
+
+Let’s take quick look at different coherence measures, and how they are calculated:
+
+    C_v measure is based on a sliding window, one-set segmentation of the top words and an indirect confirmation measure that uses normalized pointwise mutual information (NPMI) and the cosine similarity
+    C_p is based on a sliding window, one-preceding segmentation of the top words and the confirmation measure of Fitelson’s coherence
+    C_uci measure is based on a sliding window and the pointwise mutual information (PMI) of all word pairs of the given top words
+    C_umass is based on document cooccurrence counts, a one-preceding segmentation and a logarithmic conditional probability as confirmation measure
+    C_npmi is an enhanced version of the C_uci coherence using the normalized pointwise mutual information (NPMI)
+    C_a is baseed on a context window, a pairwise comparison of the top words and an indirect confirmation measure that uses normalized pointwise mutual information (NPMI) and the cosine similarity
+
+There is, of course, a lot more to the concept of topic model evaluation, and the coherence measure. However, keeping in mind the length, and purpose of this article, let’s apply these concepts into developing a model that is at least better than with the default parameters. Also, we’ll be re-purposing already available online pieces of code to support this exercise instead of re-inventing the wheel.
 
 ---->
 
-## Evaluering af LDA 
+## Evaluering af LDA og `hyperparameter tuning` (2)
+
 
 <!----
+
 Evaluation¶
 
 Evaluating an LDA (Latent Dirichlet Allocation) model is an important step in topic modeling to determine the effectiveness of the model in discovering underlying topics in a corpus of text documents. There are several methods for evaluating an LDA model, including:
@@ -791,4 +823,41 @@ Evaluating an LDA (Latent Dirichlet Allocation) model is an important step in to
 
 In summary, evaluating an LDA model involves using one or more of the above methods to measure the quality of the topics generated by the model. By evaluating the model, you can make adjustments to the parameters and improve the quality of the topics.
 
+
+
+
+Hyperparameter Tuning¶
+
+First, let’s differentiate between model hyperparameters and model parameters :
+
+    Number of Topics (K)
+    Dirichlet hyperparameter alpha: Document-Topic Density
+    Dirichlet hyperparameter beta: Word-Topic Density
+
+
+Hyperparameter tuning
+
+First, let’s differentiate between model hyperparameters and model parameters:
+
+    Model hyperparameters can be thought of as settings for a machine learning algorithm that are tuned by the data scientist before training. Examples would be the number of trees in the random forest, or in our case, number of topics K
+
+    Model parameters can be thought of as what the model learns during training, such as the weights for each word in a given topic
+
+Now that we have the baseline coherence score for the default LDA model, let’s perform a series of sensitivity tests to help determine the following model hyperparameters:
+
+    Number of topics (K)
+    Dirichlet hyperparameter alpha: Document-topic density
+    Dirichlet hyperparameter beta: Word-topic density
+
+We’ll perform these tests in sequence, one parameter at a time by keeping others constant and run them over the two different validation corpus sets. We’ll use C_v as our choice of metric for performance comparison.
+
 --->
+
+## Visualisering af LDA 
+
+<!----
+
+
+
+
+---->
