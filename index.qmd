@@ -5,6 +5,7 @@ execute:
   echo: false
 format:
   revealjs:
+    include-after-body: timer.html
     slide-number: c
     show-slide-number: print
     embed-resources: true
@@ -40,11 +41,23 @@ format:
 
 ## Topic Modeling
 
+<!---
 > *Latent Dirichlet allocation*
+
+Topic modeling is a technique used in natural language processing and machine learning to identify topics or themes that are present in a large corpus of text.
+
+    The goal of topic modeling is to extract the underlying structure of a document collection, by automatically identifying the main topics that are discussed in the text.
+        Topic modeling algorithms work by analyzing the statistical patterns of word co-occurrence in the text, and clustering together words that tend to appear together in similar contexts. These clusters of words are then interpreted as topics, which represent the main themes or ideas that are discussed in the text.
+
+One popular algorithm for topic modeling is Latent Dirichlet Allocation (LDA), which is based on a probabilistic model of document generation. LDA assumes that each document is a mixture of several topics, and each topic is a probability distribution over a fixed set of words.
+
+--->
 
 ## *Topic* Modeling
 
 > **Latent** *Dirichlet allocation*
+
+<span class="timer" data-time="120"></span>
 
 ## Topic Modeling: *anvendelsesmuligheder*
 
@@ -68,15 +81,13 @@ Topic modellering er en ML metode, der kan afdække `skjulte` topics eller temat
 
 - **Bag-of-Words antagelse**: Traditionelle topic modeller arbejder med BoW representation af tekst (mere herom snart). I næste forelæsning lærer Kristian jer om, hvordan i "overkommer" dette med nyere tilgange. 
 
-## Topic Modeling
-
-> ***Usuperviseret makinlæringsmodel***
-
 ## Topic modeling (1)
 
 > ***Usuperviseret makinlæringsmodel***
 
 > Hvad er målet i usurperviseret ML? 
+
+<span class="timer" data-time="180"></span>
 
 ## Topic modeling (2)
 
@@ -104,6 +115,8 @@ Pointer fra Rolfs anden forelæsning (***Hvad er machine learning?***):
 
 > Hvad er *kompleksitetsreduktion*, og hvad er formålet med det? 
 
+<span class="timer" data-time="180"></span>
+
 ## Topic modeling (4)
 
 > Hvad er *kompleksitetsreduktion*, og hvad er formålet med det? 
@@ -113,7 +126,7 @@ Pointer fra Rolfs anden forelæsning (***Hvad er machine learning?***):
 
 Pointer fra Rolfs tredje forelæsning (***Avanceret klyngeanalyse og datareduktion)***: 
 
-- I dag er konteksten `tekst` (ikke mennesker) og `iterative algoritmer` (probalistiske modeller; ikke rekursive algoritmer), men nogle grundlæggende ideer og principper går igen:
+- I dag er konteksten `tekst` (ikke mennesker) og `iterative algoritmer` (og probalistiske modeller; *ikke* `rekursive algoritmer`), men nogle grundlæggende ideer og principper går igen:
 
 1. Dimensioner i data er bagvedliggende faktorer, der forklarer ”ting” i data vi ellers ikke havde opdaget eller ting vi havde opdaget men fordi vi har så meget data vil tage os for evigt at forholde os til. 
 
@@ -159,11 +172,11 @@ LDA er en probabilistisk generativ model, der blev introduceret af `Blei, Ng, an
 
 ::: {.incremental}
 
-- I modsætning til traditionel klyngeanalyse, er ideen i topic modeling at hvert dokument består af flere forskellige emner i forskellige proportioner, fremfor at hvert dokument typisk kun tilhører én klynge. 
+- I modsætning til traditionel klyngeanalyse, er ideen i topic modeling at hvert dokument består af flere forskellige topics i forskellige proportioner, fremfor at hvert dokument typisk kun tilhører én klynge. 
 
 - Et dokument kan derfor tilhøre flere emner på én gang, med forskellig styrke eller sandsynlighed.
 
-- En form for specialiseret klyngeanalyse. 
+- En form for "specialiseret klyngeanalyse". 
 
 ::: 
 
@@ -232,6 +245,8 @@ Intuitionen er at hvert dokument er "skabt" på baggrund af fordelingen af topic
     - "Klima" er meget sandsynlig i vores *"miljø"*-topic, men fremkommer også i vores *"skole"*-topic, endog fremkomsten af ordet her er mindre sandsynligt en det første topic. 
 
 :::
+
+<span class="timer" data-time="120"></span>
 
 ## Latent Dirichlet allocation (5)
 
@@ -383,6 +398,8 @@ Hvor,
 
 - $\alpha, \beta$ er `hyperparametre`. 
 
+<span class="timer" data-time="180"></span>
+
 ## LDA algoritmen (3.1)
 
 Vi bruger en afart af `Bayes Theorem` til LDA, hvor vi opdaterer modellens parametre ($\theta, \phi, z$), ved at observere data, ordene, $w$:
@@ -434,7 +451,7 @@ $$
 ::: {.incremental}
 
 - $P(w|\alpha, \beta)$ er en *normaliseringsfaktor*, der sikrer at sandsynlighederne summerer til 1.
-    
+
 :::
 
 ## LDA algoritmen (3.4)
@@ -445,240 +462,333 @@ $$
 P(\theta, \phi, z \mid w, \alpha, \beta) = \frac{P(w \mid z, \phi)P(z \mid \theta)P(\theta \mid \alpha)P(\phi \mid \beta)}{P(w \mid \alpha, \beta)}
 $$
 
-Dette sker ved inferens, hvor algoritmen ser på data (tekster) og finder skjulte mønstre i ordforekomster.
+Formlen beskriver, hvordan LDA bruger data (ordene i teksterne) og prior antagelser (hyperparametrene) til iterativt at finde og opdatere topics og deres fordelinger.
 
-Formlen beskriver, hvordan LDA bruger data (ordene i dokumenterne) og tidligere antagelser (hyperparametrene) til iterativt at finde og opdatere emner og deres fordelinger.
+Den gør dette iterativt, indtil ***sandsynligheden for at observere vores data*** (givet de modellerede topis) bliver maksimal---og resultatet bliver en meningsfuld ***inddeling af store tekster i skjulte topics***.
 
-Den gør dette iterativt, indtil sandsynligheden for at observere vores data (givet modellerede emner) bliver maksimal—og resultatet bliver en realistisk, meningsfuld inddeling af store tekstsamlinger i skjulte emner.
-
-Grundlæggende vil vi finde ...  der forsøger at finde de værdier for θθ, ϕϕ og zz, der gør, at sandsynligheden bliver størst muligt (maksimerer posterior-sandsynligheden).
-
-Hypotetisk output: 
-
-Dokument-emne fordeling (θθ):
-
-    Én artikel består måske af 70% politik, 20% økonomi og 10% teknologi.
-
-Emne-ord fordeling (ϕϕ):
-
-    Emnet "politik" kunne være kendetegnet ved ord som "regering", "valg", "minister".
-    Emnet "økonomi" ved ord som "inflation", "arbejdsløshed", "vækst".
-
-LDA starter med tilfældige gæt om disse fordelinger. Derefter opdaterer den iterativt:
-
-    Hver gang algoritmen går igennem data, får den bedre "gæt".
-    Dokumenterne stabiliserer sig i klare emne-proportioner, og emnerne stabiliserer sig med klare ord-proportioner.
-
-Til sidst får vi:
-
-    Klare emner med meningsfulde ord (emne-ord fordelinger).
-    Tydelige proportioner af emner i dokumenterne (dokument-emne fordelinger).
+Grundlæggende vil vi finde de værdier for $\theta$, $\phi$ og $z$, der gør, at sandsynligheden for de pågældende topic-inddelinger bliver størst muligt (maksimering af ***posterior-sandsynligheden***).
 
 ## LDA algoritmen (3.5)
 
-Forestil dig dette simple eksempel:
+Et hypotetisk output: 
 
-    Tekst:
-    ”Regeringen vedtog ny lovgivning efter valget.”
+::: {.incremental}
 
-Antag, at vi har to emner:
+- `Document-topic` fordeling, $\theta$: Én tekst består af $70\%$ "***politik***"-topic, $20\%$ "***økonomi***"-topic og $10\%$ "***teknologi***"-topic.
 
-    Emne A (politik): ”regering”, ”valg”, ”lovgivning”
-    Emne B (sport): ”kamp”, ”mål”, ”sejr”
+- `Topic-word` fordeling, $\phi$: "***Politik***"-topic er kendetegnet ved ord som "regering", "valg", "minister". "***Økonomi***"-topic ved ord som "inflation", "arbejdsløshed", "vækst".
 
-Initialisering:
+::: {style="font-size: 75%;"}
 
-    Vi tildeler tilfældigt emner til ord, fx:
-        ”regeringen”: emne B
-        ”vedtog”: emne A
-        ”ny”: emne B
-        ”lovgivning”: emne A
-        ”efter”: emne B
-        ”valget”: emne B
+- LDA algoritmen starter med et tilfældigt startantagelse---"gæt"---vedr. disse fordelinger (ord i tilfælde topics, topic fordelinger i tekster); disse priors opdateres iterativt, $n$ antal gange (hundredevis, tusindvis). 
 
-Iteration:
+    - For hver iteration, bliver "gættet" bedre; kommer tættere på en model, der kunne have skabt den pågældende tekst (i.e., "reverse-engineering af den 'ægte' model"). 
 
-Vi tager ét ord ad gangen, fjerner dets aktuelle emne og spørger:
+    - Iteration efter iteration opdaterer algoritmen fordelingerne af topics i dokumenter ($\theta$) og fordelinger af ord i topics ($\phi$).
 
-    Hvor sandsynligt er ordet under hvert emne?
-        ”regeringen” optræder mest med ”valg”, ”lovgivning” osv. → politik sandsynligt.
-        ”mål” og ”sejr” ses ikke nær ”regeringen” → sport mindre sandsynligt.
+    - Teksterne stabiliserer sig i `topic-proportioner`, og topics stabiliserer sig med `ord-proportioner`, der passer bedst med dataen. 
 
-    Hvor sandsynligt er hvert emne i dette dokument?
-        Flest ord handler allerede om politik → emne A (politik) sandsynligt.
+    - Disse proportioner giver os endeligt meningsfulde topics med meningsfulde ord (topic-word fordelingen) og en bestemmelse af proportionerne af topics i hver tekst (document-topic fordelingen).
 
-Efter flere iterationer flytter ordene sig langsomt over i mere passende emner. Sandsynlighederne bliver mere præcise og stabile.
-Efter mange iterationer får vi:
+    - Spg.: ***Hvad vil "meningsfuld" i denne kontekst sige?***
 
-    ”regeringen” → Emne A (politik) med høj sandsynlighed.
-    ”lovgivning” → Emne A (politik)
-    ”valget” → Emne A (politik)
-    ”mål”, ”sejr” → Emne B (sport) (hvis teksten indeholdt dem)
+:::
 
-🎯 Konvergens og Resultater
-
-Når algoritmen gentager denne proces mange gange, opstår:
-
-    Stabile emne-ord fordelinger:
-    Vi kan se tydelige emner som fx ”politik”, ”sport”, ”økonomi”, osv.
-
-    Klare dokument-emne fordelinger:
-    Dokumenter får tydelige proportioner af hvert emne.
-
+:::
 
 ## L`D`A algoritmen (3.6)
 
-I LDA bruges Dirichlet-fordelingen som prior, dvs. en startantagelse om, hvordan fordelingerne bør se ud:
+::: {style="font-size: 75%;"}
 
-    Iteration efter iteration opdaterer algoritmen fordelingerne af emner i dokumenter (θθ) og fordelinger af ord i emner (ϕϕ).
-    Til sidst stabiliserer disse fordelinger sig omkring værdier, der passer bedst med data.
-
-Så Dirichlet-fordelingen hjælper algoritmen med at finde realistiske og stabile fordelinger af ord og emner.
-
-Dirichlet-fordelingen bruges i LDA, fordi den er specielt designet til fordelinger over proportioner (der summerer til 1).
-α-parametrene bestemmer graden af sparsommelighed eller ligelighed i fordelingerne.
-I praksis fungerer Dirichlet-fordelingen som en startantagelse, der opdateres iterativt i LDA-processen, hvilket fører til mere realistiske og meningsfulde emner.
-
-Hvorfor Dirichlet-fordelingen bruges i LDA (Intuition)
-
-I LDA modellerer vi sandsynligheder eller proportioner, fx:
-
-    Dokumenter indeholder forskellige emner med forskellige proportioner.
-    Emner indeholder forskellige ord med forskellige proportioner.
-
-Disse proportioner skal opfylde følgende:
-
-    Alle proportioner er positive eller nul.
-    Alle proportioner skal summere til 1 (fx 40% politik + 30% sport + 30% økonomi = 100%).
-
-Dirichlet-fordelingen er netop designet til at modellere denne slags proportioner, fordi den definerer en sandsynlighedsfordeling over proportioner, der summerer til én.
-
-Dirichlet-fordelingen er en sandsynlighedsfordeling over vektorer af proportioner. Matematikken:
-
-En tilfældig vektor θ=(θ1,θ2,…,θK) følger en Dirichlet-fordeling med parametre α=(α1,α2,…,αK), hvis sandsynlighedstæthedsfunktionen (PDF) er givet ved:
+I LDA er vores prior, startantagelse om fordelingerne, en `Dirichlet`-fordeling. 
 
 $$
 f(\theta; \alpha) = \frac{\Gamma\left(\sum_{i=1}^{K}\alpha_i\right)}{\prod_{i=1}^{K}\Gamma(\alpha_i)} \prod_{i=1}^{K}\theta_i^{\alpha_i - 1}
 $$
 
-Hver parameter αiαi​ kan tænkes som en "prior count" eller ”forventet vægt” på kategori/emne ii:
+::: {.incremental}
 
-    Lav α (fx α < 1):
-        Sandsynlighedsfordelingen koncentreres omkring få emner.
-        Resultatet: ét eller få emner dominerer (sparsom fordeling).
+- Dirichlet-fordelingen udtrykker fordelinger over (vektorer af) proportioner (der summerer til 1).
 
-    α omkring 1 (fx α = 1):
-        Emnerne er omtrent ens sandsynlige.
-        Resultatet: Mere tilfældige og jævne emnefordelinger.
+    - Fx $70\%$ "***politik***"-topic, $20\%$ "***økonomi***"-topic og $10\%$ "***teknologi***"-topic $= 100\%$ topics. 
 
-    α højere end 1 (fx α > 1):
-        Mere jævnt fordelt på tværs af alle emner.
-        Resultatet: Dokumenter har ofte en mere ligelig blanding af mange emner.
+- Når vi med LDA modellerer sandsynligheder eller proportioner for topics *i* dokumenter og ord *i* topics, *skal* proportionerne opfylde: 
 
-Kort sagt, α styrer altså, hvor meget variation og sparsommelighed der er i fordelingerne.
+    1. *Alle proportioner er positive eller nul.*
 
-LDA bruger Dirichlet-fordelingen to steder:
+    2. *Alle proportioner skal summere til $1$*
 
-    Dokument-emne-fordelingen (θθ):
-    Hvert dokument dd vælger en fordeling over emner fra en Dirichlet-fordeling:
-    θd​∼Dirichlet(α)
+- Vi bruger `Dirichlet`-fordelingen to steder: 
 
-    Emne-ord-fordelingen:
-    Hvert emne vælger en fordeling over ord fra en Dirichlet-fordeling med parameter ββ:
-    ϕk​∼Dirichlet(β)
+    1. `Document-topic` fordelingen ($\theta$): For hver tekst $\textbf{w}$ vælges en fordeling over topics fra en Dirichlet-fordeling med parameter $\alpha$, $\theta_{\textbf{w}} \sim \text{Dirichlet}(\alpha)$
 
-I praksis betyder dette, at LDA starter med:
+        - <p><span style="font-size:0.7em">*LDA starter med at gætte en tilfældigt fordeling af topics i hver tekst, styret af $\alpha$*</span></p>
 
-    At gætte en tilfældig blanding af emner i hvert dokument (styret af αα).
-    At vælge en tilfældig sammensætning af ord inden for hvert emne (styret af ββ).
+    2. `Topic-word` fordelingen ($\phi$): For hvert topic vælges en fordeling over ord fra en Dirichlet-fordeling med parameter $\beta$: $\phi_{k} \sim \text{Dirichlet}(\beta)$
 
+        - <p><span style="font-size:0.7em">*LDA starter med at en tilfældigt fordeling af ord i hvert topic, styret af $\beta$*</span></p>
+:::
 
+:::
 
-Forestil dig, at vi har 3 emner (fx Politik, Sport, Økonomi):
+## L`D`A algoritmen (3.7)
 
-Lad os vælge forskellige α-parametre:
-Eksempel A (α = [1, 1, 1])
+::: {style="font-size: 75%;"}
 
-    Emnerne er lige sandsynlige.
-    Sandsynlige blandinger:
-    (0.33, 0.33, 0.33), (0.4, 0.3, 0.3), (0.3, 0.3, 0.4) osv.
+I LDA er vores prior, startantagelse om fordelingerne, en `Dirichlet`-fordeling. 
 
-Eksempel B (α = [0.1, 0.1, 0.1])
+$$
+f(\theta; \alpha) = \frac{\Gamma\left(\sum_{i=1}^{K}\alpha_i\right)}{\prod_{i=1}^{K}\Gamma(\alpha_i)} \prod_{i=1}^{K}\theta_i^{\alpha_i - 1}
+$$
 
-    Meget sparsomme fordelinger.
-    Resultatet vil typisk være: [0.95, 0.04, 0.01] – ét emne dominerer helt.
+Parametrene $\alpha_{i}$ er vores "prior count" for topics (som vi selv vælger) og bestemmer graden af variation i fordeling af topics: 
 
-Eksempel C (α = [10, 10, 10])
+::: {.incremental}
 
-    Meget jævne fordelinger: [0.34, 0.33, 0.33].
-    Ingen emner er klart dominerende, vi får en jævn fordeling.
+- $\alpha < 1$: Sandsynlighedsfordelingen koncentreres omkring få topics. Ét eller få topics dominerer i tekster og corpus.
 
-```{python}
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.stats import dirichlet
+- $\alpha = 1$: Topics er omtrent ens sandsynlige. Tilfældige og jævne topic-fordelinger i tekster og corpus.
 
-# α-parametre (prøv at ændre disse!)
-alpha = [1, 1, 1]
+- $\alpha > 1$: Jævn fordeling på tværs af alle topics. Tekster har ofte en ligelig blanding af mange topics.
 
-# Generer data fra Dirichlet-fordelingen
-samples = dirichlet.rvs(alpha, size=5000)
+:::
 
-# Visualisering
-fig = plt.figure(figsize=(7, 6))
-ax = fig = plt.figure().add_subplot(projection='3d')
-ax = plt.axes(projection='3d')
+::: 
 
-ax.scatter(samples[:,0], samples[:,1], samples[:,2], c='green', marker='o', alpha=0.3)
-ax.set_xlabel('Emne 1')
-ax.set_ylabel('Emne 2')
-ax.set_zlabel('Emne 3')
+## L`D`A algoritmen (3.8)
 
-plt.title('Dirichlet-fordeling med α = [1, 1, 1]')
-plt.show()
+I LDA er vores prior, startantagelse om fordelingerne, en `Dirichlet`-fordeling. 
 
-```
+$$
+f(\theta; \alpha) = \frac{\Gamma\left(\sum_{i=1}^{K}\alpha_i\right)}{\prod_{i=1}^{K}\Gamma(\alpha_i)} \prod_{i=1}^{K}\theta_i^{\alpha_i - 1}
+$$
 
-## Fordele og ulemper: opsummering 
+Hypotetiske $\alpha$ parametre for et corpus med 3 topics (Politik, økonomi, klima): 
 
+::: {.incremental}
 
+1. $\alpha = [1, 1, 1]$
 
-Strengths of LDA
-Clear Probabilistic Interpretation:
+    - Emnerne er lige sandsynlige, fx: $(0.33, 0.33, 0.33)$, $(0.4, 0.3, 0.3)$, $(0.3, 0.3, 0.4)$.
 
-    LDA's explicit probabilistic formulation makes it interpretable and easy to understand mathematically.
+2. $\alpha = [0.1, 0.1, 0.1]$
 
-Simple Implementation and Efficiency:
+    - Meget sparsomme fordelinger med dominans af ét emne, fx: $(0.95, 0.04, 0.01)$.
 
-    Fast, mature implementations (e.g., Gensim, MALLET, Scikit-learn) are readily available.
-    Scales well to large datasets with Gibbs sampling or variational inference.
+3. $\alpha = [10, 10, 10]$
 
-Robustness and Flexibility:
+    - Meget jævne fordelinger hvor ingen topics er klart dominerende, fx: $(0.34, 0.33, 0.33)$.
 
-    Effective even with relatively small datasets.
-    Clear mechanisms (via priors αα and ββ) to control topic sparsity.
+:::
 
-Human-readable Outputs:
+## Fordele og ulemper (1)
 
-    Topics represented as easily interpretable distributions over words.
+<span style="color: green;">Fordele</span>
 
-Weaknesses of LDA
-Bag-of-Words Limitation:
+::: {.incremental}
 
-    LDA disregards word order and semantics, relying solely on word frequencies and co-occurrences.
-    Cannot distinguish nuanced semantic differences or polysemy (words with multiple meanings).
+::: {style="font-size: 100%;"}
 
-Sensitive to Hyperparameters and Number of Topics:
+- Topics er generelt ligefremme at tolke og "gennemsigtige", da de bliver bestemt som en samling ord og deres tilknyttede sandsynligheder, der kan tilgås. 
 
-    Choosing the number of topics KK and hyperparameters αα and ββ often involves trial-and-error or heuristics.
+- Hyperparametrene/mekanismerne, der påvirker output ($\alpha$, $\beta$), er eksplicitte og kan tilgås. 
 
-Difficulties Handling Short Texts:
+- "Nem", effektiv med mange veludviklede biblioteker (`Gensim`, `MALLET`, `Scikit-learn`), og skalerer godt (med Gibbs sampling); også med store datasæt. 
 
-    Documents with fewer words (e.g., tweets) offer less statistical evidence, resulting in poorer topic quality.
+- Fungerer uproblematisk i ustruktureret tekst med støj. 
 
-Context Insensitivity:
+- Den veletablerede matematiske ramme gør metode og resultater (relativt) nemme at forklare og argumenterer for (eller imod). 
 
-    Unable to leverage linguistic or semantic context. For example, "apple" (fruit vs. company) is ambiguous in LDA.
+:::
 
+:::
+
+> <span style="color: green;">Hvad ser *I* som fordelene ved topic modeling (med LDA)?</span>
+
+<span class="timer" data-time="120"></span>
+
+## Fordele og ulemper (2)
+
+<span style="color: red;">Ulemper</span>
+
+::: {.incremental}
+
+::: {style="font-size: 87%;"}
+
+- Lav grad af "*kontekstforståelse*", da det hele er baseret på en `bag-of-words` repræsentation af tekst; ikke ordstilling eller semantik. Konsekvensen kan være upræcise eller meningsløse topics. 
+
+- Klarer sig generelt dårligt på korte tekster, da det er en probabilistisk model og korte tekster giver meget lidt statistisk belæg; dvs. den performer dårligt på fx tweets. 
+
+- Fordi topics er baseret på statistik frem for mening kan LDA give os topics, der statistisk giver mening, men semantisk er uklare. *Det er altså en teknisk forståelse af "mening", eller substantiel eller teoretisk.*
+
+- Håndterer *polysemi* (ord med flere betydninger) og tvetydighed dårligt og kan påvirker meningen i topics negativt. 
+
+- Valget af antallet af topics og hyperparametrene, kræver en "eksperimentierende" tilgang (og erfaring). *Her kan i med jeres teoretiske viden bidrage med noget som "rene" dataloger ikke nødvendigvis kan*.
+
+:::
+
+::: 
+
+> <span style="color: red;">Hvad ser *I* som ulemperne ved topic modeling (med LDA)?</span>
+
+<span class="timer" data-time="120"></span>
+
+## Word embedding (næste gang med Kristian)
+
+<span style="color: red;">Hvis LDA vurderes utilstrækkelig?</span>
+
+Hvis vores tekster er korte, eller det bliver tydeligt at semantik og kontekst er særligt centralt for vores specifikke corpus, kan vi overveje `word embedding` metoder (fx Word2Vec, BERT), fordi denne tilgang, bl.a.: 
+
+- Bevarer semantisk kontekst. 
+
+- Håndterer polysemi bedre. 
+
+- Fungerer bedre med korte tekster.
 
 # LDA i praksis
+
+## Forventet udbytte
+
+- Arbejde med vektoriseret tekst i Python (opsummering?)
+
+- Implementering af LDA i Pythin
+
+## Vektorisering af tekst 
+
+<!-----
+
+Preprocessing
+
+we will use Spacy for text cleaning:
+
+    Remove stope words
+    Remove punctuation
+    Remove spaces
+    Keep only letters
+    keep only Nouns, Verbs, Adjectives, Adverbs
+    Return lemmatization form of the words
+
+
+
+
+    Convert the text into lowercase
+    Split text into words
+    Remove the stop loss words
+    Remove the Punctuation, any symbols, and special characters
+    Normalize the word (I’ll be using Lemmatization for normalization)
+
+    The next step is to convert the corpus (the list of documents) into a document-term Matrix using the dictionary that we had prepared above. (The vectorizer used here is the Bag of Words).
+
+
+    After preprocessing the text, we don’t need to explicitly create the document term matrix (DTM). Gensim package has an internal mechanism to create the DTM.
+This output implies:
+
+    Document wise we have the index of the word and its frequency.
+    The 0th word is repeated 1 time, then the 1st word repeated 1, and so on …
+
+For gensim: Using gensim for Document Term Matrix(DTM), we don’t need to explicitly create the DTM matrix from scratch. The gensim library has an internal mechanism to create the DTM.
+For sklearn: Use either the Count vectorizer or TF-IDF vectorizer to transform the Document Term Matrix (DTM) into numerical arrays.
+
+---->
+
+## Implementering af LDA 
+
+<!----
+
+LDA with Gensim
+
+Latent Dirichlet Allocation (LDA) is a popular probabilistic topic modeling algorithm.
+
+    The basic idea behind LDA is to represent a collection of documents as a mixture of latent topics, where each topic is a probability distribution over words. The goal of LDA is to learn these latent topics and their associated word distributions from the documents.
+
+    LDA assumes that each document in the collection is generated from a mixture of K topics, where K is a predefined number of topics. Each topic is represented as a probability distribution over words, and each word in a document is generated from one of the K topics according to a probability distribution.
+
+The LDA algorithm uses an iterative process to learn the latent topics and their associated word distributions. The basic steps of the algorithm are:
+
+    Initialize the topic assignments for each word in each document randomly. For each document:
+        Compute the topic proportions for the document based on the current topic assignments.
+        For each word in the document:
+        Compute the probability of each topic generating the word based on the current topic proportions and word distribution.
+        Assign the word to a new topic based on these probabilities. Repeat steps 2 and 3 until convergence.
+    Once the algorithm has converged, the learned topic distributions can be used to identify the most important topics in the collection and the words that are most strongly associated with each topic.
+
+Gensim will go through the process of finding the best word distribution for each topic, and best topic distribution for each document.
+
+    Input:
+        Document-term matrix, a Bag-Of-Words (BOW) format.
+        Number of topics
+        Numper of iterations
+    Output: the top words in each topic
+
+
+we pass the vectorized corpus to the LDA model for both the packages gensim and sklearn.
+
+
+
+    Next, we implement the LDA model by creating the object and passing the required arguments:
+
+This output means: each of the 52 unique words is given weights based on the topics. In other words, it implies which of the words dominate the topics.
+
+    Now, we find the topics from Corpus:
+
+This returns the following six topics (indexed from 0,1,2,3,4,5) with the five words in each of the topics along with their respective weights.
+
+    Now, we assign these resultant topics to the documents via:
+
+
+Parameters for LDA model in gensim
+
+Following are the important and commonly used parameters for LDA for implementing in the gensim package:
+
+    The corpus or the document-term matrix to be passed to the model (in our example is called doc_term_matrix)
+    Number of Topics: num_topics is the number of topics we want to extract from the corpus.
+    id2word: It is the mapping from word indices to words. Each of the words has an index that is present in the dictionary.
+    Number of Iterations: it is represented by Passes in Python. Another technical word for iterations is ‘epochs’. Passes control how often we want to train the model on the entire corpus for convergence.
+    Chunksize: It is the number of documents to be used in each training chunk. The chunksize controls how many documents can be processed at one time in the training algorithm.
+
+    LDA’s model parameters:
+
+ 
+
+    Alpha: is the document-topic density
+    Beta: (In Python, this parameter is called ‘eta’): is the topic word density
+
+
+    For, the higher values of alpha —> the documents will be composed of more topics, and
+    The lower values of alpha —> returns documents with fewer topics.
+
+Similarly, for the values of Beta:
+
+    The higher beta —> has more number of words in a given topic, and
+    The lower value of beta —> topics contains few words.
+
+It is better to keep alpha and beta parameters as ‘auto’ because the model is automatically learning these two parameters.
+
+
+
+Finally, we'll generate our base LDA model.
+
+Since we have a small to medium-sized dataset, we can use LdaModel for topic modeling. However, if we have a large dataset, it is recommended to use LdaMulticore to speed up the computation.
+
+My hypothesis is that there will be 5 Topics as there was 5 seasons.
+
+---->
+
+## Evaluering af LDA 
+
+<!----
+Evaluation¶
+
+Evaluating an LDA (Latent Dirichlet Allocation) model is an important step in topic modeling to determine the effectiveness of the model in discovering underlying topics in a corpus of text documents. There are several methods for evaluating an LDA model, including:
+
+    Perplexity: Perplexity is a commonly used metric for evaluating LDA models. It measures how well the model predicts new data. A lower perplexity score indicates better performance. You can calculate perplexity using the log_perplexity() method of the LDA model in gensim.
+
+    Coherence: Coherence measures the degree of semantic similarity between the top N words in each topic. Higher coherence scores indicate better topic quality. You can calculate coherence using the CoherenceModel class in gensim.
+
+    Visualization: Visualization can be used to visually inspect the quality of the topics generated by the LDA model. You can use the pyLDAvis package in Python to create interactive visualizations of the topics.
+
+    Human evaluation: Finally, you can also perform human evaluation by having human annotators review the topics generated by the LDA model and provide feedback on the quality and interpretability of the topics.
+
+In summary, evaluating an LDA model involves using one or more of the above methods to measure the quality of the topics generated by the model. By evaluating the model, you can make adjustments to the parameters and improve the quality of the topics.
+
+--->
