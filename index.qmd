@@ -39,35 +39,71 @@ format:
 
 :::
 
+## Tilgangen til dages forelæsning
+
+```
+lda_model = gensim.models.ldamodel.LdaModel(corpus=corpus,
+                                            id2word=id2word,
+                                            num_topics=2, 
+                                            random_state=100,
+                                            update_every=1,
+                                            chunksize=100,
+                                            passes=10,
+                                            alpha='auto',
+                                            eta='auto',
+                                            per_word_topics=True)
+```
+
+## Tilgangen til dages forelæsning
+
+```
+[Preprocessing]
+
+```
+
+```
+lda_model = gensim.models.ldamodel.LdaModel(corpus=corpus,
+                                            id2word=id2word,
+                                            num_topics=2, 
+                                            random_state=100,
+                                            update_every=1,
+                                            chunksize=100,
+                                            passes=10,
+                                            alpha='auto',
+                                            eta='auto',
+                                            per_word_topics=True)
+```
+
+```
+
+[Evaluering]
+```
+
 ## Topic Modeling
-
-<!---
-> *Latent Dirichlet allocation*
-
-Topic modeling is a technique used in natural language processing and machine learning to identify topics or themes that are present in a large corpus of text.
-
-    The goal of topic modeling is to extract the underlying structure of a document collection, by automatically identifying the main topics that are discussed in the text.
-        Topic modeling algorithms work by analyzing the statistical patterns of word co-occurrence in the text, and clustering together words that tend to appear together in similar contexts. These clusters of words are then interpreted as topics, which represent the main themes or ideas that are discussed in the text.
-
-One popular algorithm for topic modeling is Latent Dirichlet Allocation (LDA), which is based on a probabilistic model of document generation. LDA assumes that each document is a mixture of several topics, and each topic is a probability distribution over a fixed set of words.
-
-Latent Dirichlet Allocation (LDA) is a popular probabilistic topic modeling algorithm.
-
-    The basic idea behind LDA is to represent a collection of documents as a mixture of latent topics, where each topic is a probability distribution over words. The goal of LDA is to learn these latent topics and their associated word distributions from the documents.
-
-    LDA assumes that each document in the collection is generated from a mixture of K topics, where K is a predefined number of topics. Each topic is represented as a probability distribution over words, and each word in a document is generated from one of the K topics according to a probability distribution.
-
---->
 
 ## *Topic* Modeling
 
 > **Latent** *Dirichlet allocation*
 
+::: {style="font-size: 75%;"}
+::: {.incremental}
+
+- LDA er en populær---og den mest simple---model til topic modeling. 
+
+- En probalistisk model, der fungere ved at finde skjulte strukturer i data, ved at se på ords *co-occurence* (Reed, 2012). 
+
+- LDA prøver konceptuelt at genskabe den model, der teoretisk kunne have *genereret* en tekst, ved at inferere de skjulte strukturer i dataen. 
+
+- Vi kan anse LDA som en **dimensionalitetsreduktionsteknik** (kompleksitetsreduktion); en principal component analysis (`PCA`) for diskrete data (Blei, 2012, Blei et al., 2003)
+
+:::
+:::
+
 <span class="timer" data-time="120"></span>
 
 ## Topic Modeling: *anvendelsesmuligheder*
 
-Topic modellering er en ML metode, der kan afdække `skjulte` topics eller tematikker i en stor samling tekst dokumenter. 
+Topic modellering er en ML metode, der kan afdække `skjulte` topics eller tematikker i en stor samling tekst dokumenter (se praktisk eksempel i Asmussen & Møller, 2019). 
 
 - **Dokument-"klynger"**: automatisk gruppering af tekster i kategorier. 
 
@@ -89,7 +125,7 @@ Topic modellering er en ML metode, der kan afdække `skjulte` topics eller temat
 
 ## Topic modeling (1)
 
-> ***Usuperviseret makinlæringsmodel***
+> ***Usuperviseret machine learning***
 
 > Hvad er målet i usurperviseret ML? 
 
@@ -97,7 +133,7 @@ Topic modellering er en ML metode, der kan afdække `skjulte` topics eller temat
 
 ## Topic modeling (2)
 
-> ***Usuperviseret makinlæringsmodel***
+> ***Usuperviseret machine learning***
 
 > Hvad er målet i usurperviseret ML? 
 
@@ -228,7 +264,7 @@ Intuitionen er at hvert dokument er "skabt" på baggrund af fordelingen af topic
 
 - Hvert topic er repræsenteret som sandsynligheden for at hvert ord er del af det pågældende topic. 
 
-    > **Hvis en tekst** (*repræsenteret som BoW*) **er $80\%$ "politik", $15\%$ "krig" og $5\%$ "forskning", ville en korrekt specificeret model (teoretisk) kunne genskabe denne BoW, ved at vælge $80\%$ "politik-ord", $15\%$ "krigs-ord" og $5\%$ "forsknings-ord", hvis vi gender de underliggende fordelinger af topics of ord** 
+    > **Hvis en tekst** (*repræsenteret som BoW*) **er $80\%$ "politik", $15\%$ "krig" og $5\%$ "forskning", ville en korrekt specificeret model (teoretisk) kunne genskabe denne BoW, ved at vælge $80\%$ "politik-ord", $15\%$ "krigs-ord" og $5\%$ "forsknings-ord", hvis vi kender de underliggende fordelinger af topics of ord** 
 
 - Teknisk vil vi fra vores corpus udlede de skjulte fordelinger: 
 
@@ -304,7 +340,7 @@ Intuitionen er at hvert dokument er "skabt" på baggrund af fordelingen af topic
 
     2. `Document-topic` fordelingen, $\theta$: *hvor fremtræden hvert topic er i hvert dokument*.
 
-    3. Vi bruger `Gibbs sampling` til at estimere disse fordelinger. 
+    3. Vi bruger `Gibbs sampling` til at estimere disse fordelinger, fordi den ægte posterior fordeling ikke kan estimeres i praksis (se Blei, 2012). 
 
 :::
 
@@ -316,7 +352,7 @@ Intuitionen er at hvert dokument er "skabt" på baggrund af fordelingen af topic
 
 ## Inferens: hvordan "lærer" LDA (2)
 
-LDA er en `iterativ algoritme`, der tilskriver topics ved:  
+LDA er en `iterativ algoritme`, der tilskriver topics ved at bestemme:  
 
 ::: {.incremental}
 
@@ -348,7 +384,7 @@ LDA er en `iterativ algoritme`, der tilskriver topics ved:
 
 ::: {style="font-size: 75%;"}
 
-LDA er iterativ, idet det er en proces, hvor algoritmen laver en gradvis "forbedring" af resultaterne (fordelingerne)---gører tilpasningsdelen igen og igen---indtil den finder en stabil løsning (konvergerer), hvor hver gentagelse kun ændrer resultaterne minimalt. Ved dette punkt har algoritmen har fundet et stabilt sæt af topics. 
+LDA er iterativ, idet det er en proces, hvor algoritmen laver en gradvis "forbedring" af resultaterne (fordelingerne)---udfører tilpasningsdelen igen og igen---indtil den finder en stabil løsning (konvergerer), hvor hver gentagelse kun ændrer resultaterne minimalt. Ved dette punkt har algoritmen har fundet et stabilt sæt af topics. 
 
 ```
 
@@ -386,7 +422,7 @@ Slut
 
 ## LDA algoritmen (1.2)
 
-**Hvordan virker algoritmen? (e.g., p. 1005 i Blei et al., 2003): *Inferens af posteriour distributions*.**
+**Hvordan virker algoritmen? (se også p. 1005 i Blei et al., 2003): *Inferens af posteriour distributions*.**
 
 ::: {style="font-size: 50%;"}
 
@@ -418,7 +454,7 @@ Go through each place and person over and over again. Your guesses keep getting 
 
 ## LDA algoritmen (2)
 
-Vi bruger en afart af `Bayes Theorem` til LDA, hvor vi opdaterer modellens parametre ($\theta, \phi, z$), ved at observere data, ordene, $w$:
+`Bayes Theorem` ligger til grund for LDA, idet vi opdaterer modellens parametre ($\theta, \phi, z$), ved at observere data, ordene, $w$:
 
 $$
 P(\theta, \phi, z \mid w, \alpha, \beta) = \frac{P(w \mid z, \phi)~P(z \mid \theta)~P(\theta \mid \alpha)~P(\phi \mid \beta)}{P(w \mid \alpha, \beta)}
@@ -440,7 +476,7 @@ Hvor,
 
 ## LDA algoritmen (3.1)
 
-Vi bruger en afart af `Bayes Theorem` til LDA, hvor vi opdaterer modellens parametre ($\theta, \phi, z$), ved at observere data, ordene, $w$:
+`Bayes Theorem` ligger til grund for LDA, idet vi opdaterer modellens parametre ($\theta, \phi, z$), ved at observere data, ordene, $w$:
 
 $$
 P(\theta, \phi, z \mid w, \alpha, \beta) = \frac{P(w \mid z, \phi)~P(z \mid \theta)~P(\theta \mid \alpha)~P(\phi \mid \beta)}{P(w \mid \alpha, \beta)}
@@ -461,7 +497,7 @@ $$
 
 ## LDA algoritmen (3.2)
 
-Vi bruger en afart af `Bayes Theorem` til LDA, hvor vi opdaterer modellens parametre ($\theta, \phi, z$), ved at observere data, ordene, $w$:
+`Bayes Theorem` ligger til grund for LDA, idet vi opdaterer modellens parametre ($\theta, \phi, z$), ved at observere data, ordene, $w$:
 
 $$
 P(\theta, \phi, z \mid w, \alpha, \beta) = \frac{P(w \mid z, \phi)~P(z \mid \theta)~P(\theta \mid \alpha)~P(\phi \mid \beta)}{P(w \mid \alpha, \beta)}
@@ -481,7 +517,7 @@ $$
 
 ## LDA algoritmen (3.3)
 
-Vi bruger en afart af `Bayes Theorem` til LDA, hvor vi opdaterer modellens parametre ($\theta, \phi, z$), ved at observere data, ordene, $w$:
+`Bayes Theorem` ligger til grund for LDA, idet vi opdaterer modellens parametre ($\theta, \phi, z$), ved at observere data, ordene, $w$:
 
 $$
 P(\theta, \phi, z \mid w, \alpha, \beta) = \frac{P(w \mid z, \phi)~P(z \mid \theta)~P(\theta \mid \alpha)~P(\phi \mid \beta)}{P(w \mid \alpha, \beta)}
@@ -496,7 +532,7 @@ $$
 
 ## LDA algoritmen (3.4)
 
-Vi bruger en afart af `Bayes Theorem` til LDA, hvor vi opdaterer modellens parametre ($\theta, \phi, z$), ved at observere data, ordene, $w$:
+`Bayes Theorem` ligger til grund for LDA, idet vi opdaterer modellens parametre ($\theta, \phi, z$), ved at observere data, ordene, $w$:
 
 $$
 P(\theta, \phi, z \mid w, \alpha, \beta) = \frac{P(w \mid z, \phi)~P(z \mid \theta)~P(\theta \mid \alpha)~P(\phi \mid \beta)}{P(w \mid \alpha, \beta)}
@@ -525,9 +561,9 @@ Et hypotetisk output:
 
 ::: {style="font-size: 75%;"}
 
-- LDA algoritmen starter med et tilfældigt startantagelse---"gæt"---vedr. disse fordelinger (ord i tilfælde topics, topic fordelinger i tekster); disse priors opdateres iterativt, $n$ antal gange (hundredevis, tusindvis). 
+- LDA algoritmen starter med et tilfældigt startantagelse---"gæt"---vedr. disse fordelinger (ord i tilfælde topics, tilfældige topic fordelinger i tekster); disse priors opdateres iterativt, $n$ antal gange (hundredevis, tusindvis). 
 
-    - For hver iteration, bliver "gættet" bedre; kommer tættere på en model, der kunne have skabt den pågældende tekst (i.e., "reverse-engineering af den 'ægte' model"). 
+    - For hver iteration, bliver "gættet" bedre. Modellen kommer tættere på en model, der kunne have skabt den pågældende tekst (i.e., "reverse-engineering af den 'ægte' model"). 
 
     - Iteration efter iteration opdaterer algoritmen fordelingerne af topics i dokumenter ($\theta$) og fordelinger af ord i topics ($\phi$).
 
@@ -555,7 +591,7 @@ $$
 
 ::: {.incremental}
 
-- Dirichlet-fordelingen udtrykker fordelinger over (vektorer af) proportioner (der summerer til 1).
+- Dirichlet-fordelingen udtrykker fordelinger over (vektorer af) proportioner, der summerer til 1.
 
     - Fx $70\%$ "***politik***"-topic, $20\%$ "***økonomi***"-topic og $10\%$ "***teknologi***"-topic $= 100\%$ topics. 
 
@@ -598,15 +634,9 @@ Parametrene $\alpha_{i}$ er vores "prior count" for topics (som vi selv vælger)
 
 - $\alpha > 1$: Jævn fordeling på tværs af alle topics. Tekster har ofte en ligelig blanding af mange topics.
 
-<!---
-    For, the higher values of alpha —> the documents will be composed of more topics, and
-    The lower values of alpha —> returns documents with fewer topics.
+    - Altså, jo højere $\alpha$, des flere topics i hver tekst og *vice versa*, og
 
-Similarly, for the values of Beta:
-
-    The higher beta —> has more number of words in a given topic, and
-    The lower value of beta —> topics contains few words.
----->
+    - for $\beta$: Jo højere værdi, des flere ord i et given topic og *vice versa*. 
 
 :::
 
@@ -645,6 +675,8 @@ Hypotetiske $\alpha$ parametre for et corpus med 3 topics (Politik, økonomi, kl
 ::: {.incremental}
 
 ::: {style="font-size: 100%;"}
+
+- Den simpleste topic model. 
 
 - Topics er generelt ligefremme at tolke og "gennemsigtige", da de bliver bestemt som en samling ord og deres tilknyttede sandsynligheder, der kan tilgås. 
 
@@ -779,16 +811,122 @@ Højere kohærens betyder, at topics er mere meningsfulde og forståelige.
 
 Når vi taler om en models hyperparametre, referer vi til de "settings" som en ML algoritme er indstillet til før træningsprocessen. I vores tilfælde er det bl.a. antallet af topics, $K$, som vi selv skal angive. 
 
-- Vi med `sensitivitetstest` "indstille" de mest optimale Dirichlet hyperparametre, $\alpha$ (`Document-Topic` Density) og $\beta$ (`Word-Topic` Density).  
+- Vi kan med `grid search` "indstille" de mest optimale Dirichlet hyperparametre, $\alpha$ (`Document-Topic` Density) og $\beta$ (`Word-Topic` Density).  
 
 <span class="timer" data-time="120"></span>
 
 
 ## Visualisering af LDA 
 
-<!----
 
+```{python}
+#| echo: true
+#| code-fold: true
+#| code-summary: "klik for at se koden"
 
+import warnings
+warnings.filterwarnings("ignore",category=DeprecationWarning)
+warnings.simplefilter(action='ignore', category=FutureWarning)
+import pandas as pd
+import re 
+import numpy as np
+from pprint import pprint 
+import gensim
+import gensim.corpora as corpora
+from gensim.utils import simple_preprocess
+from gensim.models import CoherenceModel
+import spacy
+from nltk.corpus import stopwords
+stop_words = stopwords.words('english')
+import pyLDAvis
+import pyLDAvis.gensim
 
+df = pd.read_json('https://raw.githubusercontent.com/selva86/datasets/master/newsgroups.json')
 
----->
+# Konverter til liste
+data = df.content.values.tolist()
+
+# Regex
+data = [re.sub('\\S*@\\S*\\s?', '', sent) for sent in data]
+data = [re.sub('\\s+', ' ', sent) for sent in data]
+data = [re.sub("\\'", "", sent) for sent in data]
+
+# Tokenize vores sætninger
+def sent_to_words(sentences):
+    for sentence in sentences:
+        yield(gensim.utils.simple_preprocess(str(sentence), deacc=True))  # deacc=True fjerner tegnsætning
+
+data_words = list(sent_to_words(data))
+
+# Konstruér bi- og tri-grams
+bigram = gensim.models.Phrases(data_words, min_count=5, threshold=100) # higher threshold fewer phrases.
+
+bigram_mod = gensim.models.phrases.Phraser(bigram)
+
+# Stop-ord funktion
+def remove_stopwords(texts):
+    return [[word for word in simple_preprocess(str(doc)) if word not in stop_words] for doc in texts]
+
+# Bi-gram funktion:
+def make_bigrams(texts):
+    return [bigram_mod[doc] for doc in texts]
+
+# Tri-gram funktion:
+def make_trigrams(texts):
+    return [trigram_mod[bigram_mod[doc]] for doc in texts]
+
+# Lemmatization funktion: 
+def lemmatization(texts, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV']):
+    """https://spacy.io/api/annotation"""
+    texts_out = [] # Tom liste til output
+    for sent in texts: # loop henover sætningerne (sent)
+        doc = nlp(" ".join(sent)) 
+        texts_out.append([token.lemma_ for token in doc if token.pos_ in allowed_postags])
+    return texts_out # Output i defineret liste
+
+# Vi fjerner Stop Words
+data_words_nostops = remove_stopwords(data_words)
+
+# Vi danner bi-grams
+data_words_bigrams = make_bigrams(data_words_nostops)
+
+# Vi inddrager SpaCy engelske sprogmodel
+nlp = spacy.load('en_core_web_sm', disable=['parser', 'ner'])
+
+# Lemmaticering af ord
+data_lemmatized = lemmatization(data_words_bigrams, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV'])
+
+# Konstruér ordliste (w)
+id2word = corpora.Dictionary(data_lemmatized)
+
+# Definér corpus (M)
+texts = data_lemmatized
+
+# Ord frekvenser i corpus
+corpus = [id2word.doc2bow(text) for text in texts]
+
+final_lda_model = gensim.models.ldamodel.LdaModel(corpus=corpus,
+                                                    id2word=id2word,
+                                                    num_topics=5, 
+                                                    random_state=100,
+                                                    update_every=1,
+                                                    chunksize=100,
+                                                    passes=10,
+                                                    alpha='auto',
+                                                    eta='auto',
+                                                    per_word_topics=True)
+
+pyLDAvis.enable_notebook()
+vis = pyLDAvis.gensim.prepare(final_lda_model, corpus, id2word)
+vis
+```
+
+# Dagens workshop 
+
+## Øvelse
+
+Lav en LDA-model baseret på et `selvvalgt corpus`, hvor fokus er på at kunne forklare modellens output på en substantiel måde---altså med ord, og ikke udelukkende matematiske/tekniske detaljer og græske symboler. Diskutér også modellens eventuelle begrænsninger.
+
+*Forklaringen skal være målrettet en modtager med en kandidatgrad i Sociologi eller Politisk Administration, som har kendskab til kvantitative metoder (statistik), men ingen praktisk erfaring med machine learning eller topic modeling.*
+
+> **Tænk øvelsen som en jobinterview-situation**: Forestil dig, at en potentiel arbejdsgiver---som kun har hørt, at "AI er det nye"---spørger, hvordan topic modeling (`LDA`) kan bidrage til *problemstilling X*. Hvordan ville I besvare dette på en klar måde, hvor I fremhæver både fordele og ulemper?
